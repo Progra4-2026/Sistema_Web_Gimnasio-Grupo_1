@@ -1,0 +1,22 @@
+.lista-blog {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 2.5rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.25rem;
+}
+
+.lista-blog li {
+  border-left: 4px solid var(--color-primario);
+}
+
+.lista-blog a {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--color-secundario);
+}
+
+.lista-blog p {
+  margin: 0.4rem 0 0;
+}
