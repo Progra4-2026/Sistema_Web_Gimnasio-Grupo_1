@@ -23,7 +23,7 @@ export class ApiError extends Error {
         this.errores = errores;   // errores por campo que devuelve el backend, si hay
     }
 }
-//
+
 const MENSAJES_POR_ESTADO = {
     400: 'Algunos datos no son válidos. Revisá el formulario.',
     404: 'El recurso solicitado no existe.',
