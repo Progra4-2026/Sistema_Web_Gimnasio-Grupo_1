@@ -7,6 +7,7 @@
         <meta name="description" content="Inscripción, cursos, rutinas, máquinas, instructores, mantenimiento y desinscripción de Gimnasio PowerFit." />
         <link rel="stylesheet" href="../css/global.css"/>
         <link rel="stylesheet" href="../css/servicios.css"/>
+        <script type="module" src="../js/servicios.js"></script>
     </head>
 
     <body>
@@ -47,7 +48,7 @@
             <section id="inscripcion" class="seccion seccion-servicio" aria-labelledby="titulo-inscripcion">
                 <h2 id="titulo-inscripcion">Inscripción</h2>
                 <p>Completá tus datos para inscribirte a una rutina o a un curso. La información se enviará al backend para su almacenamiento en la base de datos.</p>
-                <form class="formulario" action="#" method="post">
+                <form class="formulario" id="form-inscripcion" action="#" method="post">
                     <div class="campo-formulario">
                         <label for="ins-nombre">Nombre completo <span class="obligatorio">*</span></label>
                         <input type="text" id="ins-nombre" name="nombre" required minlength="3" maxlength="80" placeholder="Ej: Juan Pérez Alvarado" />
@@ -90,14 +91,16 @@
                     </div>
 
                     <button type="submit" class="boton">Inscribirme</button>
+                    <div id="mensajes-inscripcion" aria-live="polite"></div>
                 </form>
             </section>
 
             <section id="cursos" class="seccion seccion-servicio" aria-labelledby="titulo-cursos">
                 <h2 id="titulo-cursos">Cursos</h2>
                 <p>Estos son ejemplos de cursos disponibles. La información real se obtendrá desde la base de datos una vez conectado el backend.</p>
+                <div id="mensajes-cursos" aria-live="polite"></div>
 
-                <div class="rejilla">
+                <div class="rejilla" id="lista-cursos">
                     <article class="tarjeta tarjeta-curso">
                         <img src="../assets/clase_spinning.jpg" alt="Clase de spinning" width="320" height="180" />
                         <div class="tarjeta-curso__cuerpo">
@@ -145,7 +148,7 @@
 
                 <div class="tarjeta aviso-acceso">
                     <p><strong>Acceso restringido.</strong> Iniciá sesión con tu usuario y contraseña de cliente para ver tus rutinas asignadas.</p>
-                    <form class="formulario formulario-inline" action="#" method="post">
+                    <form class="formulario formulario-inline" id="form-login-rutinas" action="#" method="post">
                         <div class="campo-formulario">
                             <label for="rut-usuario">Usuario</label>
                             <input type="text" id="rut-usuario" name="usuario" required placeholder="usuario" />
@@ -248,7 +251,7 @@
                 </div>
 
                 <div class="pestanas-mantenimiento">
-                    <form class="formulario-mantenimiento" action="#" method="get">
+                    <form class="formulario-mantenimiento" id="form-mant-buscar" action="#" method="get">
                         <fieldset class="formulario">
                             <legend>Consultar (Select)</legend>
                             <div class="campo-formulario">
@@ -270,7 +273,7 @@
                         </fieldset>
                     </form>
 
-                    <form class="formulario-mantenimiento" action="#" method="post">
+                    <form class="formulario-mantenimiento" id="form-mant-agregar" action="#" method="post">
                         <fieldset class="formulario">
                             <legend>Agregar (Insert)</legend>
                             <div class="campo-formulario">
@@ -287,7 +290,7 @@
                         </fieldset>
                     </form>
 
-                    <form class="formulario-mantenimiento" action="#" method="post">
+                    <form class="formulario-mantenimiento" id="form-mant-actualizar" action="#" method="post">
                         <fieldset class="formulario">
                             <legend>Actualizar (Update)</legend>
                             <div class="campo-formulario">
@@ -304,7 +307,7 @@
                         </fieldset>
                     </form>
 
-                    <form class="formulario-mantenimiento" action="#" method="post">
+                    <form class="formulario-mantenimiento" id="form-mant-eliminar" action="#" method="post">
                         <fieldset class="formulario">
                             <legend>Eliminar (Delete)</legend>
                             <div class="campo-formulario">
@@ -321,7 +324,7 @@
                 <h2 id="titulo-desinscribirse">Desinscribirse</h2>
                 <p>Podés retirar tu inscripción del gimnasio siempre y cuando te encontrés al día con tus pagos.</p>
 
-                <form class="formulario" action="#" method="post">
+                <form class="formulario" id="form-desinscripcion" action="#" method="post">
                     <div class="campo-formulario">
                         <label for="desin-cedula">Cédula / Identificación <span class="obligatorio">*</span></label>
                         <input type="text" id="desin-cedula" name="cedula" required pattern="[0-9]{9,12}" title="Ingrese solo números, entre 9 y 12 dígitos" placeholder="Ej: 304560789" />
