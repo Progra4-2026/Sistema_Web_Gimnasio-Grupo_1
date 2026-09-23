@@ -1,0 +1,408 @@
+/* =========================================================
+   Gimnasio PowerFit - Grupo 1
+   Hoja de estilos GLOBAL (compartida por todas las páginas)
+   ========================================================= */
+
+:root {
+  --color-primario: #ff5a1f;
+  --color-primario-oscuro: #d94a15;
+  --color-secundario: #1a1a2e;
+  --color-fondo: #f7f7fa;
+  --color-texto: #222222;
+  --color-texto-claro: #ffffff;
+  --color-borde: #e0e0e6;
+  --color-exito: #1f8a4c;
+  --color-error: #c62828;
+  --fuente-base: "Segoe UI", Roboto, Arial, sans-serif;
+  --radio-borde: 10px;
+  --sombra: 0 2px 10px rgba(0, 0, 0, 0.08);
+  --transicion: 0.2s ease-in-out;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+    height: 100vh;
+    margin: 0;
+    font-family: var(--fuente-base);
+    background-color: var(--color-fondo);
+    color: var(--color-texto);
+    line-height: 1.6;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+a {
+  color: var(--color-primario);
+  text-decoration: none;
+}
+
+a:hover,
+a:focus {
+  text-decoration: underline;
+}
+
+/* ---------- Utilidades ---------- */
+
+.contenedor {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 1.25rem;
+}
+
+.visualmente-oculto {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.boton {
+  display: inline-block;
+  background-color: var(--color-primario);
+  color: var(--color-texto-claro);
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--radio-borde);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color var(--transicion);
+}
+
+.boton:hover,
+.boton:focus {
+  background-color: var(--color-primario-oscuro);
+  text-decoration: none;
+}
+
+.boton-secundario {
+  background-color: transparent;
+  color: var(--color-secundario);
+  border: 2px solid var(--color-secundario);
+}
+
+.boton-secundario:hover {
+  background-color: var(--color-secundario);
+  color: var(--color-texto-claro);
+}
+
+.boton-peligro {
+  background-color: var(--color-error);
+}
+
+.boton-peligro:hover {
+  background-color: #9c1f1f;
+}
+
+.tarjeta {
+  background-color: #fff;
+  border-radius: var(--radio-borde);
+  box-shadow: var(--sombra);
+  padding: 1.5rem;
+}
+
+.mensaje {
+  padding: 0.85rem 1.1rem;
+  border-radius: var(--radio-borde);
+  margin: 1rem 0;
+  font-weight: 600;
+}
+
+.mensaje.exito {
+  background-color: #e3f6ea;
+  color: var(--color-exito);
+  border: 1px solid var(--color-exito);
+}
+
+.mensaje.error {
+  background-color: #fdecea;
+  color: var(--color-error);
+  border: 1px solid var(--color-error);
+}
+
+/* ---------- Encabezado / Navegación principal ---------- */
+.encabezado-sitio {
+  background-color: var(--color-secundario);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: var(--sombra);
+}
+
+.barra-navegacion {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0.9rem 1.25rem;
+}
+
+.logo-gimnasio {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--color-texto-claro);
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+}
+
+.logo-gimnasio span.acento {
+  color: var(--color-primario);
+}
+
+.menu-principal {
+  list-style: none;
+  display: flex;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+}
+
+.menu-principal a {
+  color: var(--color-texto-claro);
+  padding: 0.6rem 1rem;
+  border-radius: var(--radio-borde);
+  font-weight: 600;
+  transition: background-color var(--transicion);
+}
+
+.menu-principal a:hover,
+.menu-principal a:focus,
+.menu-principal a[aria-current="page"] {
+  background-color: var(--color-primario);
+  text-decoration: none;
+}
+
+.boton-menu-movil {
+  display: none;
+  background: none;
+  border: 2px solid var(--color-texto-claro);
+  color: var(--color-texto-claro);
+  font-size: 1.1rem;
+  padding: 0.4rem 0.7rem;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* Interruptor de menú móvil (checkbox-hack, sin JavaScript): ver regla
+   .interruptor-menu:checked ~ nav .menu-principal en la sección de media queries */
+
+/* ---------- Pie de página ---------- */
+.pie-sitio {
+  background-color: var(--color-secundario);
+  color: var(--color-texto-claro);
+  margin-top: 3rem;
+}
+
+.pie-sitio .contenedor {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  padding: 2.5rem 1.25rem;
+}
+
+.pie-sitio h2 {
+  font-size: 1.05rem;
+  margin-top: 0;
+}
+
+.pie-sitio ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.pie-sitio li {
+  margin-bottom: 0.4rem;
+}
+
+.pie-sitio a {
+  color: #d7d7e0;
+}
+
+.derechos {
+  text-align: center;
+  padding: 1rem;
+  background-color: #12121f;
+  font-size: 0.85rem;
+  color: #a0a0b0;
+}
+
+/* ---------- Íconos de redes sociales ---------- */
+.redes-sociales {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.icono-red {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: var(--color-primario);
+  color: var(--color-texto-claro);
+  transition: transform var(--transicion), background-color var(--transicion);
+}
+
+.icono-red:hover,
+.icono-red:focus {
+  background-color: var(--color-primario-oscuro);
+  transform: translateY(-3px);
+  text-decoration: none;
+}
+
+.icono-red svg {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+}
+
+/* ---------- Formularios (genérico, usado en Contactos, Servicios, etc.) ---------- */
+.formulario {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  max-width: 600px;
+}
+
+.campo-formulario {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.campo-formulario label {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.campo-formulario .obligatorio {
+  color: var(--color-error);
+}
+
+.campo-formulario input,
+.campo-formulario select,
+.campo-formulario textarea {
+  padding: 0.65rem 0.8rem;
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-borde);
+  font-family: inherit;
+  font-size: 1rem;
+  background-color: #fff;
+}
+
+.campo-formulario input:focus,
+.campo-formulario select:focus,
+.campo-formulario textarea:focus {
+  outline: 2px solid var(--color-primario);
+  outline-offset: 1px;
+}
+
+.campo-formulario input:invalid:not(:placeholder-shown),
+.campo-formulario textarea:invalid:not(:placeholder-shown) {
+  border-color: var(--color-error);
+}
+
+.texto-ayuda {
+  font-size: 0.8rem;
+  color: #666;
+}
+
+fieldset.formulario {
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-borde);
+  padding: 1.25rem;
+}
+
+fieldset.formulario legend {
+  font-weight: 700;
+  padding: 0 0.5rem;
+  color: var(--color-primario);
+}
+
+/* ---------- Secciones genéricas ---------- */
+.seccion {
+  padding: 3rem 0;
+}
+
+.seccion h1,
+.seccion h2 {
+  margin-top: 0;
+}
+
+.titulo-seccion {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.titulo-seccion p {
+  color: #555;
+  max-width: 650px;
+  margin: 0.5rem auto 0;
+}
+
+/* ---------- Grillas responsive (flexbox / grid) ---------- */
+.rejilla {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.5rem;
+}
+
+.rejilla--estrecha {
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+/* ---------- Media queries: tablet y móvil ---------- */
+@media (max-width: 768px) {
+  .barra-navegacion {
+    flex-wrap: wrap;
+  }
+
+  .boton-menu-movil {
+    display: inline-block;
+  }
+
+  .menu-principal {
+    display: none;
+    width: 100%;
+    flex-direction: column;
+    gap: 0.25rem;
+    margin-top: 0.75rem;
+  }
+
+  .interruptor-menu:checked ~ nav .menu-principal {
+    display: flex;
+  }
+
+  .seccion {
+    padding: 2rem 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .logo-gimnasio {
+    font-size: 1.1rem;
+  }
+
+  .boton {
+    width: 100%;
+    text-align: center;
+  }
+}

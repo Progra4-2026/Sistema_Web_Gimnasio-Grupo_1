@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Gimnasio PowerFit - Servicios</title>
+        <meta name="description" content="Inscripción, cursos, rutinas, máquinas, instructores, mantenimiento y desinscripción de Gimnasio PowerFit." />
+        <link rel="stylesheet" href="../css/global.css"/>
+        <link rel="stylesheet" href="../css/servicios.css"/>
+    </head>
+
+    <body>
+        <header class="encabezado-sitio">
+            <div class="barra-navegacion">
+                <a href="inicio.html" class="logo-gimnasio">Gimnasio <span class="acento">PowerFit</span></a>
+                <input type="checkbox" id="interruptor-menu" class="interruptor-menu visualmente-oculto" />
+                <label for="interruptor-menu" class="boton-menu-movil">Menú</label>
+                <nav aria-label="Menú principal">
+                    <ul class="menu-principal" id="menu-principal">
+                        <li><a href="inicio.html">Inicio</a></li>
+                        <li><a href="contacto.html">Contactos</a></li>
+                        <li><a href="servicios.html" aria-current="page">Servicios</a></li>
+                        <li><a href="blog.html">Blog</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </header>
+
+        <div class="titulo-seccion contenedor titulo-seccion--servicios">
+            <h1>Servicios</h1>
+            <p>Todo lo que necesitás para tu proceso en el gimnasio, en un solo lugar.</p>
+        </div>
+
+        <nav class="submenu-servicios" aria-label="Submenú de servicios">
+            <ul class="contenedor">
+                <li><a href="#inscripcion">Inscripción</a></li>
+                <li><a href="#cursos">Cursos</a></li>
+                <li><a href="#rutinas">Rutinas</a></li>
+                <li><a href="#maquinas">Máquinas</a></li>
+                <li><a href="#instructores">Instructores</a></li>
+                <li><a href="#mantenimiento">Mantenimiento</a></li>
+                <li><a href="#desinscribirse">Desinscribirse</a></li>
+            </ul>
+        </nav>
+
+        <main class="contenedor">
+            <section id="inscripcion" class="seccion seccion-servicio" aria-labelledby="titulo-inscripcion">
+                <h2 id="titulo-inscripcion">Inscripción</h2>
+                <p>Completá tus datos para inscribirte a una rutina o a un curso. La información se enviará al backend para su almacenamiento en la base de datos.</p>
+                <form class="formulario" action="#" method="post">
+                    <div class="campo-formulario">
+                        <label for="ins-nombre">Nombre completo <span class="obligatorio">*</span></label>
+                        <input type="text" id="ins-nombre" name="nombre" required minlength="3" maxlength="80" placeholder="Ej: Juan Pérez Alvarado" />
+                    </div>
+
+                    <div class="campo-formulario">
+                        <label for="ins-cedula">Cédula / Identificación <span class="obligatorio">*</span></label>
+                        <input type="text" id="ins-cedula" name="cedula" required pattern="[0-9]{9,12}" title="Ingrese solo números, entre 9 y 12 dígitos" placeholder="Ej: 304560789" />
+                        <span class="texto-ayuda">Solo números, entre 9 y 12 dígitos.</span>
+                    </div>
+
+                    <div class="campo-formulario">
+                        <label for="ins-email">Correo electrónico <span class="obligatorio">*</span></label>
+                        <input type="email" id="ins-email" name="email" required placeholder="ejemplo@correo.com" />
+                    </div>
+
+                    <div class="campo-formulario">
+                        <label for="ins-telefono">Teléfono <span class="obligatorio">*</span></label>
+                        <input type="tel" id="ins-telefono" name="telefono" required pattern="[0-9]{4}-?[0-9]{4}" title="Ingrese 8 dígitos, por ejemplo 8888-8888" placeholder="8888-8888" />
+                    </div>
+
+                    <div class="campo-formulario">
+                        <label for="ins-nacimiento">Fecha de nacimiento <span class="obligatorio">*</span></label>
+                        <input type="date" id="ins-nacimiento" name="fecha_nacimiento" required min="1920-01-01" max="2026-09-08" />
+                    </div>
+
+                    <div class="campo-formulario">
+                        <label for="ins-tipo">Tipo de inscripción <span class="obligatorio">*</span></label>
+                        <select id="ins-tipo" name="tipo_inscripcion" required>
+                            <option value="">Seleccione una opción</option>
+                            <option value="rutina">Rutina personalizada</option>
+                            <option value="curso">Curso grupal</option>
+                        </select>
+                    </div>
+
+                    <div class="campo-formulario">
+                        <label for="ins-password">Contraseña <span class="obligatorio">*</span></label>
+                        <input type="password" id="ins-password" name="password" required minlength="8" placeholder="Mínimo 8 caracteres" />
+                        <span class="texto-ayuda">Se almacenará cifrada, nunca en texto plano.</span>
+                    </div>
+
+                    <button type="submit" class="boton">Inscribirme</button>
+                </form>
+            </section>
+
+            <section id="cursos" class="seccion seccion-servicio" aria-labelledby="titulo-cursos">
+                <h2 id="titulo-cursos">Cursos</h2>
+                <p>Estos son ejemplos de cursos disponibles. La información real se obtendrá desde la base de datos una vez conectado el backend.</p>
+
+                <div class="rejilla">
+                    <article class="tarjeta tarjeta-curso">
+                        <img src="../assets/clase_spinning.jpg" alt="Clase de spinning" width="320" height="180" />
+                        <div class="tarjeta-curso__cuerpo">
+                            <p class="etiqueta-id">Curso #1</p>
+                            <h3>Spinning</h3>
+                            <p>Clase cardiovascular de alta intensidad en bicicleta estática.</p>
+                            <ul class="lista-detalles">
+                                <li><strong>Horario:</strong> Lun/Mié/Vie, 6:00 a.m.</li>
+                                <li><strong>Disponibilidad:</strong> 8 cupos</li>
+                            </ul>
+                        </div>
+                    </article>
+
+                    <article class="tarjeta tarjeta-curso">
+                        <img src="../assets/clase_yoga.jpg" alt="Clase de yoga" width="320" height="180" />
+                        <div class="tarjeta-curso__cuerpo">
+                            <p class="etiqueta-id">Curso #2</p>
+                            <h3>Yoga funcional</h3>
+                            <p>Ejercicios de flexibilidad, respiración y relajación.</p>
+                            <ul class="lista-detalles">
+                                <li><strong>Horario:</strong> Mar/Jue, 7:00 p.m.</li>
+                                <li><strong>Disponibilidad:</strong> 12 cupos</li>
+                            </ul>
+                        </div>
+                    </article>
+
+                    <article class="tarjeta tarjeta-curso">
+                        <img src="../assets/clase_crossfit.jpg" alt="Clase de CrossFit" width="320" height="180" />
+                        <div class="tarjeta-curso__cuerpo">
+                            <p class="etiqueta-id">Curso #3</p>
+                            <h3>CrossFit</h3>
+                            <p>Entrenamiento funcional de alta intensidad en grupo.</p>
+                            <ul class="lista-detalles">
+                                <li><strong>Horario:</strong> Lun a Vie, 5:30 p.m.</li>
+                                <li><strong>Disponibilidad:</strong> Sin cupos</li>
+                            </ul>
+                        </div>
+                    </article>
+                </div>
+            </section>
+
+            <section id="rutinas" class="seccion seccion-servicio" aria-labelledby="titulo-rutinas">
+                <h2 id="titulo-rutinas">Rutinas</h2>
+                <p>Las rutinas son personales: cada cliente ve únicamente las suyas una vez inscrito e iniciada la sesión.</p>
+
+                <div class="tarjeta aviso-acceso">
+                    <p><strong>Acceso restringido.</strong> Iniciá sesión con tu usuario y contraseña de cliente para ver tus rutinas asignadas.</p>
+                    <form class="formulario formulario-inline" action="#" method="post">
+                        <div class="campo-formulario">
+                            <label for="rut-usuario">Usuario</label>
+                            <input type="text" id="rut-usuario" name="usuario" required placeholder="usuario" />
+                        </div>
+                        <div class="campo-formulario">
+                            <label for="rut-password">Contraseña</label>
+                            <input type="password" id="rut-password" name="password" required minlength="8" placeholder="Contraseña" />
+                        </div>
+                        <button type="submit" class="boton">Iniciar sesión</button>
+                    </form>
+                </div>
+
+                <h3>Vista previa (datos de ejemplo)</h3>
+
+                <table class="tabla-datos">
+                    <caption class="visualmente-oculto">Ejemplo de rutina asignada</caption>
+                    <thead>
+                    <tr>
+                        <th scope="col">Día</th>
+                        <th scope="col">Ejercicio</th>
+                        <th scope="col">Series x Repeticiones</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr><td>Lunes</td><td>Sentadillas</td><td>4 x 12</td></tr>
+                    <tr><td>Miércoles</td><td>Press de banca</td><td>4 x 10</td></tr>
+                    <tr><td>Viernes</td><td>Peso muerto</td><td>3 x 8</td></tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section id="maquinas" class="seccion seccion-servicio" aria-labelledby="titulo-maquinas">
+                <h2 id="titulo-maquinas">Máquinas</h2>
+                <p>Listado de máquinas y equipo disponible en nuestras instalaciones.</p>
+
+                <div class="rejilla rejilla--estrecha">
+                    <article class="tarjeta tarjeta-maquina">
+                        <img src="../assets/caminadora_electrica.jpg" alt="Caminadora eléctrica" width="220" height="160" />
+                        <h3>Caminadora eléctrica</h3>
+                    </article>
+
+                    <article class="tarjeta tarjeta-maquina">
+                        <img src="../assets/bici_estatica.jpg" alt="Bicicleta estática" width="220" height="160" />
+                        <h3>Bicicleta estática</h3>
+                    </article>
+
+                    <article class="tarjeta tarjeta-maquina">
+                        <img src="../assets/leg_press.jpg" alt="Prensa de piernas" width="220" height="160" />
+                        <h3>Prensa de piernas</h3>
+                    </article>
+
+                    <article class="tarjeta tarjeta-maquina">
+                        <img src="../assets/maquina_remo.jpg" alt="Máquina de remo" width="220" height="160" />
+                        <h3>Máquina de remo</h3>
+                    </article>
+
+                    <article class="tarjeta tarjeta-maquina">
+                        <img src="../assets/estacion_multi_fuerza.jpg" alt="Estación multifuerza" width="220" height="160" />
+                        <h3>Estación multifuerza</h3>
+                    </article>
+
+                    <article class="tarjeta tarjeta-maquina">
+                        <img src="../assets/eliptica.jpg" alt="Elípticas" width="220" height="160" />
+                        <h3>Elípticas</h3>
+                    </article>
+                </div>
+            </section>
+
+            <section id="instructores" class="seccion seccion-servicio" aria-labelledby="titulo-instructores">
+                <h2 id="titulo-instructores">Instructores</h2>
+                <p>Conocé a nuestro equipo de instructores certificados.</p>
+
+                <div class="rejilla rejilla--estrecha">
+                    <article class="tarjeta tarjeta-instructor">
+                        <img src="../assets/profile_pic.jpg" alt="Foto del instructor Carlos Jiménez" width="180" height="180" />
+                        <h3>Carlos Jiménez</h3>
+                        <p class="texto-ayuda">Entrenador de fuerza</p>
+                    </article>
+
+                    <article class="tarjeta tarjeta-instructor">
+                        <img src="../assets/profile_pic.jpg" alt="Foto de la instructora Ana Vargas" width="180" height="180" />
+                        <h3>Ana Vargas</h3>
+                        <p class="texto-ayuda">Instructora de yoga y flexibilidad</p>
+                    </article>
+
+                    <article class="tarjeta tarjeta-instructor">
+                        <img src="../assets/profile_pic.jpg" alt="Foto del instructor Luis Rojas" width="180" height="180" />
+                        <h3>Luis Rojas</h3>
+                        <p class="texto-ayuda">Entrenador de CrossFit</p>
+                    </article>
+                </div>
+            </section>
+
+            <section id="mantenimiento" class="seccion seccion-servicio" aria-labelledby="titulo-mantenimiento">
+                <h2 id="titulo-mantenimiento">Mantenimiento</h2>
+                <p>Sección exclusiva para instructores y personal administrativo: gestión de rutinas, máquinas, clientes, cursos e historial.</p>
+
+                <div class="tarjeta aviso-acceso">
+                    <p><strong>Acceso restringido a personal autorizado.</strong> Se requiere iniciar sesión con un usuario con rol de instructor o administrador.</p>
+                </div>
+
+                <div class="pestanas-mantenimiento">
+                    <form class="formulario-mantenimiento" action="#" method="get">
+                        <fieldset class="formulario">
+                            <legend>Consultar (Select)</legend>
+                            <div class="campo-formulario">
+                                <label for="mant-buscar-tabla">Tabla</label>
+                                <select id="mant-buscar-tabla" name="tabla">
+                                    <option value="clientes">Clientes</option>
+                                    <option value="cursos">Cursos</option>
+                                    <option value="rutinas">Rutinas</option>
+                                    <option value="maquinas">Máquinas</option>
+                                </select>
+                            </div>
+
+                            <div class="campo-formulario">
+                                <label for="mant-buscar-valor">Buscar por ID o nombre</label>
+                                <input type="text" id="mant-buscar-valor" name="valor_busqueda" placeholder="Ej: 12 o 'Sentadillas'" />
+                            </div>
+
+                            <button type="submit" class="boton boton-secundario">Buscar</button>
+                        </fieldset>
+                    </form>
+
+                    <form class="formulario-mantenimiento" action="#" method="post">
+                        <fieldset class="formulario">
+                            <legend>Agregar (Insert)</legend>
+                            <div class="campo-formulario">
+                                <label for="mant-nuevo-nombre">Nombre <span class="obligatorio">*</span></label>
+                                <input type="text" id="mant-nuevo-nombre" name="nombre_nuevo" required minlength="2" maxlength="100" />
+                            </div>
+
+                            <div class="campo-formulario">
+                                <label for="mant-nuevo-desc">Descripción</label>
+                                <textarea id="mant-nuevo-desc" name="descripcion_nueva" rows="3" maxlength="300"></textarea>
+                            </div>
+
+                            <button type="submit" class="boton">Agregar registro</button>
+                        </fieldset>
+                    </form>
+
+                    <form class="formulario-mantenimiento" action="#" method="post">
+                        <fieldset class="formulario">
+                            <legend>Actualizar (Update)</legend>
+                            <div class="campo-formulario">
+                                <label for="mant-act-id">ID del registro <span class="obligatorio">*</span></label>
+                                <input type="number" id="mant-act-id" name="id_actualizar" required min="1" max="999999" />
+                            </div>
+
+                            <div class="campo-formulario">
+                                <label for="mant-act-nombre">Nuevo nombre</label>
+                                <input type="text" id="mant-act-nombre" name="nombre_actualizar" maxlength="100" />
+                            </div>
+
+                            <button type="submit" class="boton boton-secundario">Actualizar</button>
+                        </fieldset>
+                    </form>
+
+                    <form class="formulario-mantenimiento" action="#" method="post">
+                        <fieldset class="formulario">
+                            <legend>Eliminar (Delete)</legend>
+                            <div class="campo-formulario">
+                                <label for="mant-elim-id">ID del registro <span class="obligatorio">*</span></label>
+                                <input type="number" id="mant-elim-id" name="id_eliminar" required min="1" max="999999" />
+                            </div>
+                            <button type="submit" class="boton boton-peligro">Eliminar registro</button>
+                        </fieldset>
+                    </form>
+                </div>
+            </section>
+
+            <section id="desinscribirse" class="seccion seccion-servicio" aria-labelledby="titulo-desinscribirse">
+                <h2 id="titulo-desinscribirse">Desinscribirse</h2>
+                <p>Podés retirar tu inscripción del gimnasio siempre y cuando te encontrés al día con tus pagos.</p>
+
+                <form class="formulario" action="#" method="post">
+                    <div class="campo-formulario">
+                        <label for="desin-cedula">Cédula / Identificación <span class="obligatorio">*</span></label>
+                        <input type="text" id="desin-cedula" name="cedula" required pattern="[0-9]{9,12}" title="Ingrese solo números, entre 9 y 12 dígitos" placeholder="Ej: 304560789" />
+                    </div>
+
+                    <div class="campo-formulario">
+                        <label for="desin-password">Contraseña <span class="obligatorio">*</span></label>
+                        <input type="password" id="desin-password" name="password" required minlength="8" />
+                    </div>
+
+                    <div class="campo-formulario">
+                        <label for="desin-motivo">Motivo de la baja</label>
+                        <select id="desin-motivo" name="motivo">
+                            <option value="cambio_gimnasio">Cambio de gimnasio</option>
+                            <option value="tiempo">Falta de tiempo</option>
+                            <option value="economico">Motivos económicos</option>
+                            <option value="otro">Otro</option>
+                        </select>
+                    </div>
+
+                    <p class="texto-ayuda">Nota: la solicitud solo se procesará si no existen pagos pendientes asociados a tu cuenta.</p>
+                    <button type="submit" class="boton boton-peligro">Confirmar desinscripción</button>
+                </form>
+            </section>
+        </main>
+
+        <footer class="pie-sitio">
+            <div class="contenedor">
+                <div>
+                    <h2>Gimnasio PowerFit</h2>
+                    <p>Tu mejor versión empieza aquí.</p>
+                </div>
+
+                <div>
+                    <h2>Enlaces</h2>
+                    <ul>
+                        <li><a href="inicio.html">Inicio</a></li>
+                        <li><a href="contacto.html">Contactos</a></li>
+                        <li><a href="servicios.html">Servicios</a></li>
+                        <li><a href="blog.html">Blog</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h2>Horario</h2>
+                    <p>Lun-Vie: 5:00 a.m. - 9:00 p.m.<br />Sáb: 7:00 a.m. - 2:00 p.m.</p>
+                </div>
+            </div>
+            <p class="derechos">&copy; 2026 Gimnasio PowerFit - Grupo 1. Proyecto académico Programación 4, Universidad Nacional.</p>
+        </footer>
+    </body>
+</html>

@@ -1,36 +1,3 @@
-# Sistema Web Gimnasio - Grupo 1
-
-Proyecto para el curso **Programación 4 (EIF209)**, Escuela de Informática, Universidad Nacional.
-Profesora: Marianella Solano Orias.
-
-## Integrantes
-
-| Nombre completo | Rol |
-|---|--|
-| Christopher Blanco Solano | Desarrollador |
-| Alexander Dittel Escobar | Desarrollador |
-| Aslehy Claret Aguilar Perez | Desarrollador |
-
-## Descripción
-
-Sistema web para la gestión de un gimnasio (inscripciones, cursos, rutinas, máquinas e instructores), desarrollado con backend en **Spring Boot** y frontend **SPA en React**.
-
-## Tecnologías utilizadas
-
-- **Backend:** Java 26, Spring Boot, Spring Data JPA, Maven
-- **Base de datos:** MySQL 9.6
-- **Frontend:** React + Vite
-- **Control de versiones:** Git / GitHub
-
-## Estructura del repositorio
-
-```
-Sistema_Web_Gimnasio-Grupo_1/
-├── backend/     # Proyecto Spring Boot (API REST)
-├── frontend/    # Proyecto React (SPA)
-└── database/
-    └── GIMNASIO.sql   # Script de creación de tablas y datos de prueba
-```
 
 ## Requisitos previos
 
@@ -70,11 +37,11 @@ Deberías ver: `cliente`, `cursos`, `Curso_cliente`, `historial_curso`, `instruc
 1. Abrí la carpeta `backend/` con IntelliJ (`File → Open`).
 2. Verificá/editá `backend/src/main/resources/application.properties` con las credenciales de tu MySQL local:
 
-   ```properties
+```properties
    spring.datasource.url=jdbc:mysql://localhost:3306/gimnasio_db
    spring.datasource.username=root
    spring.datasource.password=TU_PASSWORD
-   ```
+```
 
 3. Dejá que IntelliJ descargue las dependencias de Maven (barra de progreso inferior).
 4. Ejecutá la clase principal `GimnasioBackendApplication.java` (botón ▶️ o `Run`).
@@ -101,6 +68,17 @@ npm run dev
 Abrí en el navegador la URL que indique la terminal (por defecto `http://localhost:5173`).
 
 Deberías ver el componente principal mostrando **"Sistema Web Gimnasio - Grupo 1"**.
+
+## 5. Ver las páginas estáticas (Entregable 2)
+
+Con el mismo servidor de Vite corriendo (`npm run dev`), las páginas HTML5/CSS3 del Entregable 2 se sirven directamente desde `frontend/public/`, sin pasar por React:
+- http://localhost:5173/inicio.html
+- http://localhost:5173/blog.html
+- http://localhost:5173/contacto.html
+- http://localhost:5173/servicios.html
+
+
+Estas páginas son independientes del SPA de React — conviven en el mismo repositorio pero no comparten código ni build.
 
 ## Endpoints disponibles
 
