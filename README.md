@@ -1,3 +1,30 @@
+# Sistema Web Gimnasio PowerFit — Grupo 1
+
+Sistema web para la gestión de un gimnasio: inscripciones, cursos, rutinas, máquinas e instructores. Proyecto del curso **Programación 4 (EIF209)**, Escuela de Informática, Universidad Nacional — II Ciclo 2026.
+
+## Integrantes
+
+| Nombre completo | Rol |
+|---|---|
+| Christopher Blanco Solano | Desarrollador |
+| Alexander Dittel Escobar | Desarrollador |
+| Aslehy Claret Aguilar Perez | Desarrollador |
+
+## Descripción del sistema
+
+El sistema permite a los clientes inscribirse a rutinas personalizadas o cursos grupales, consultar los cursos disponibles y enviar consultas al gimnasio; y al personal administrar la información de clientes, instructores, cursos, máquinas y rutinas.
+
+| Capa | Tecnología | Carpeta |
+|---|---|---|
+| Base de datos | MySQL 8 | `database/` |
+| Backend (API REST) | Java + Spring Boot, servidor Tomcat embebido (puerto 8080) | `backend/` |
+| Frontend SPA | React + Vite (puerto 5173) | `frontend/src/` |
+| Páginas del sitio (HTML5, CSS3 y JavaScript) | HTML/CSS + módulos ES6 servidos por Vite | `frontend/public/` |
+
+Avance por entregable:
+- **Entregable 1:** acta de constitución, ambiente de desarrollo y modelo de datos (`docs/`, `database/GIMNASIO.sql`).
+- **Entregable 2:** páginas HTML5/CSS3 responsive: Inicio, Contactos, Servicios y Blog.
+- **Entregable 3:** JavaScript del lado del cliente: validación de formularios, eventos y manipulación del DOM, `fetch` con `async/await` contra el backend, `localStorage` / `sessionStorage` y mensajes de éxito/error sin recargar la página.
 
 ## Requisitos previos
 
@@ -69,18 +96,37 @@ Abrí en el navegador la URL que indique la terminal (por defecto `http://localh
 
 Deberías ver el componente principal mostrando **"Sistema Web Gimnasio - Grupo 1"**.
 
-## 5. Ver las páginas estáticas (Entregable 2)
+## 5. Ver las páginas del sitio (Entregables 2 y 3)
 
-Con el mismo servidor de Vite corriendo (`npm run dev`), las páginas HTML5/CSS3 del Entregable 2 se sirven directamente desde `frontend/public/`, sin pasar por React:
+Con el mismo servidor de Vite corriendo (`npm run dev`), las páginas se sirven directamente desde `frontend/public/`, sin pasar por React:
 - http://localhost:5173/html/inicio.html
 - http://localhost:5173/html/blog.html
 - http://localhost:5173/html/contacto.html
 - http://localhost:5173/html/servicios.html
 
-Estructura: los HTML están en `frontend/public/html/`, los estilos en `frontend/public/css/` y las imágenes en `frontend/public/assets/`.
+Estructura:
+
+| Carpeta | Contenido |
+|---|---|
+| `frontend/public/html/` | páginas HTML |
+| `frontend/public/css/` | estilos (`global.css` + uno por página) |
+| `frontend/public/assets/` | imágenes |
+| `frontend/public/js/` | JavaScript del Entregable 3 (módulos ES6) |
+
+Módulos JavaScript (`frontend/public/js/`):
+
+| Archivo | Responsabilidad |
+|---|---|
+| `validaciones.js` | Validación de campos en el cliente (obligatorios, correo, teléfono, longitudes, patrones, fechas) con mensajes bajo cada campo |
+| `api.js` | Llamadas `fetch` al backend con `async/await` y manejo de errores |
+| `storage.js` | `localStorage` (preferencias, datos recordados) y `sessionStorage` (borradores, caché de cursos) |
+| `formularios.js` | Utilidades de formularios: mensajes de éxito/error, creación de campos, mostrar/ocultar contraseña |
+| `contacto.js` | Lógica de la página Contactos (formulario de consulta) |
+| `servicios.js` | Lógica de la página Servicios (inscripción, cursos, campos dinámicos, formularios de mantenimiento) |
+
+**Para que los formularios y la lista de cursos funcionen, el backend tiene que estar corriendo** (paso 3). Sin él, las páginas cargan igual, pero al enviar un formulario se muestra un mensaje de error de conexión y la sección de Cursos se queda con las tarjetas de ejemplo del HTML.
 
 > **Nota:** si abrís una ruta que no existe (por ejemplo la vieja `/main.html` o `/inicio.html` sin `/html/`), Vite no da 404 sino que devuelve `index.html` y vas a ver la app de React en lugar de la página estática.
-
 
 Estas páginas son independientes del SPA de React — conviven en el mismo repositorio pero no comparten código ni build.
 
@@ -89,6 +135,9 @@ Estas páginas son independientes del SPA de React — conviven en el mismo repo
 | Método | Ruta | Descripción |
 |---|---|---|
 | GET | `/api/health` | Verifica que el backend esté activo. Responde `{"status":"ok"}` |
+| GET | `/api/cursos` | Lista de cursos (descripción, horario, cupos, imagen) |
+| POST | `/api/consultas` | Recibe el formulario de Contactos. `201` si es válido, `400` con los errores por campo si no |
+| POST | `/api/inscripciones` | Recibe el formulario de Inscripción. `201` si es válido, `400` si hay datos inválidos, `409` si la cédula ya está inscrita |
 
 ## Flujo de trabajo en GitHub
 
