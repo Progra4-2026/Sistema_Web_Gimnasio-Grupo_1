@@ -406,3 +406,90 @@ fieldset.formulario legend {
     text-align: center;
   }
 }
+/* =========================================================
+   Entregable 3 — Retroalimentación de JavaScript
+   (validaciones.js, formularios.js)
+   ========================================================= */
+
+/* Estado de cada campo según la validación en JS */
+.campo-formulario--activo label {
+  color: var(--color-primario);
+}
+
+.campo-formulario--error input,
+.campo-formulario--error select,
+.campo-formulario--error textarea {
+  border-color: var(--color-error);
+  background-color: #fff8f7;
+}
+
+.campo-formulario--valido input,
+.campo-formulario--valido select,
+.campo-formulario--valido textarea {
+  border-color: var(--color-exito);
+}
+
+.mensaje-campo {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-error);
+}
+
+.mensaje-campo:empty {
+  display: none;
+}
+
+.contador-caracteres {
+  align-self: flex-end;
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.contador-caracteres--limite {
+  color: var(--color-error);
+  font-weight: 600;
+}
+
+/* Casilla "Recordar mis datos" */
+.campo-casilla {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.campo-casilla input {
+  width: 1.1rem;
+  height: 1.1rem;
+  accent-color: var(--color-primario);
+}
+
+/* Mensajes generales (éxito / error / info) con botón de cierre */
+.mensaje {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.mensaje.info {
+  background-color: #eef3fb;
+  color: #1f4e8a;
+  border: 1px solid #1f4e8a;
+}
+
+.mensaje__cerrar {
+  background: none;
+  border: none;
+  color: inherit;
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+}
+
+.boton:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}

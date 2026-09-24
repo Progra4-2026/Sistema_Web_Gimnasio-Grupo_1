@@ -7,6 +7,7 @@
         <meta name="description" content="Información de contacto y formulario de consultas de Gimnasio PowerFit."/>
         <link rel="stylesheet" href="../css/global.css"/>
         <link rel="stylesheet" href="../css/contacto.css"/>
+        <script type="module" src="../js/contacto.js"></script>
     </head>
 
     <body>
@@ -86,7 +87,7 @@
                     <h2 id="titulo-formulario">Formulario de consultas</h2>
                     <p class="texto-ayuda">Los campos marcados con <span class="obligatorio">*</span> son obligatorios.</p>
 
-                    <form class="formulario" action="#" method="post">
+                    <form class="formulario" id="form-consulta" action="#" method="post">
                         <div class="campo-formulario">
                             <label for="nombre">Nombre completo <span class="obligatorio">*</span></label>
                             <input
@@ -144,7 +145,13 @@
                                     placeholder="Escribí tu consulta aquí..."></textarea>
                         </div>
 
+                        <div class="campo-casilla">
+                            <input type="checkbox" id="recordar-datos" name="recordar_datos" />
+                            <label for="recordar-datos">Recordar mis datos en este navegador</label>
+                        </div>
+
                         <button type="submit" class="boton">Enviar consulta</button>
+                        <div id="mensajes-consulta" aria-live="polite"></div>
                     </form>
                 </section>
             </div>
