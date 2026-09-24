@@ -158,13 +158,3 @@
     align-items: stretch;
   }
 }
-
-.campo-invalido {
-  border-color: var(--color-error);
-  outline-color: var(--color-error);
-}
-
-.mensaje-error-campo {
-  color: var(--color-error);
-  font-size: 0.9rem;
-}

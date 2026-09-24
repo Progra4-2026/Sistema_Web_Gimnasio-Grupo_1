@@ -51,7 +51,7 @@
                 <form class="formulario" id="form-inscripcion" action="#" method="post">
                     <div class="campo-formulario">
                         <label for="ins-nombre">Nombre completo <span class="obligatorio">*</span></label>
-                        <input type="text" id="ins-nombre" name="nombre" required minlength="3" maxlength="80" placeholder="Ej: Juan Pérez Alvarado" />
+                        <input type="text" id="ins-nombre" name="nombre" required minlength="3" maxlength="80" pattern="[A-Za-zÁÉÍÓÚáéíóúÑñÜü ]+" title="Solo letras y espacios, sin números ni símbolos" placeholder="Ej: Juan Pérez Alvarado" />
                     </div>
 
                     <div class="campo-formulario">
@@ -72,7 +72,8 @@
 
                     <div class="campo-formulario">
                         <label for="ins-nacimiento">Fecha de nacimiento <span class="obligatorio">*</span></label>
-                        <input type="date" id="ins-nacimiento" name="fecha_nacimiento" required min="1920-01-01" max="2026-09-08" />
+                        <input type="date" id="ins-nacimiento" name="fecha_nacimiento" required min="1920-01-01" max="2026-09-08" data-edad-minima="14" />
+                        <span class="texto-ayuda">Edad mínima para inscribirse: 14 años.</span>
                     </div>
 
                     <div class="campo-formulario">

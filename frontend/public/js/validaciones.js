@@ -114,7 +114,11 @@ export function validarCampo(campo) {
     if (tipo === 'date') {
         // Las fechas ISO (AAAA-MM-DD) se pueden comparar como texto
         if (campo.min && valor < campo.min) return `La fecha no puede ser anterior a ${campo.min}.`;
-        if (campo.max && valor > campo.max) return `La fecha no puede ser posterior a ${campo.max}.`;
+        if (campo.max && valor > campo.max) {
+            return campo.dataset.edadMinima
+                ? `Debés tener al menos ${campo.dataset.edadMinima} años.`
+                : `La fecha no puede ser posterior a ${campo.max}.`;
+        }
     }
 
     return '';
@@ -222,6 +226,44 @@ export function validarFormulario(formulario) {
     return primerInvalido === null;
 }
 
+/** Fecha local en formato AAAA-MM-DD (toISOString usaría UTC y podría correr el día). */
+function fechaISO(fecha) {
+    const mes = String(fecha.getMonth() + 1).padStart(2, '0');
+    const dia = String(fecha.getDate()).padStart(2, '0');
+    return `${fecha.getFullYear()}-${mes}-${dia}`;
+}
+
+/**
+ * Activa la validación en vivo de UN campo. Se exporta para los campos
+ * que se crean dinámicamente después de cargar la página.
+ */
+export function activarValidacionCampo(campo) {
+    const contenedor = obtenerContenedor(campo);
+
+    // data-edad-minima: el máximo de la fecha se calcula contra el día de hoy
+    if (campo.type === 'date' && campo.dataset.edadMinima) {
+        const limite = new Date();
+        limite.setFullYear(limite.getFullYear() - Number(campo.dataset.edadMinima));
+        campo.max = fechaISO(limite);
+    }
+
+    campo.addEventListener('focus', () => contenedor.classList.add('campo-formulario--activo'));
+
+    campo.addEventListener('blur', () => {
+        contenedor.classList.remove('campo-formulario--activo');
+        campo.dataset.tocado = 'true';
+        mostrarEstadoCampo(campo, validarCampo(campo));
+    });
+
+    const revalidar = () => {
+        if (campo.dataset.tocado === 'true') mostrarEstadoCampo(campo, validarCampo(campo));
+    };
+    campo.addEventListener('input', revalidar);
+    campo.addEventListener('change', revalidar);
+
+    if (campo.tagName === 'TEXTAREA') activarContador(campo);
+}
+
 /**
  * Activa la validación en vivo de un formulario:
  *  - blur: valida el campo al salir de él.
@@ -234,23 +276,7 @@ export function activarValidacion(formulario) {
     formulario.noValidate = true;
 
     for (const campo of camposValidables(formulario)) {
-        const contenedor = obtenerContenedor(campo);
-
-        campo.addEventListener('focus', () => contenedor.classList.add('campo-formulario--activo'));
-
-        campo.addEventListener('blur', () => {
-            contenedor.classList.remove('campo-formulario--activo');
-            campo.dataset.tocado = 'true';
-            mostrarEstadoCampo(campo, validarCampo(campo));
-        });
-
-        const revalidar = () => {
-            if (campo.dataset.tocado === 'true') mostrarEstadoCampo(campo, validarCampo(campo));
-        };
-        campo.addEventListener('input', revalidar);
-        campo.addEventListener('change', revalidar);
-
-        if (campo.tagName === 'TEXTAREA') activarContador(campo);
+        activarValidacionCampo(campo);
     }
 
     formulario.addEventListener('reset', () => {

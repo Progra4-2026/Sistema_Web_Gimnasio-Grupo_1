@@ -45,6 +45,10 @@ public class InscripcionController {
         }
         if (vacio(ins.tipoInscripcion()) || !Set.of("rutina", "curso").contains(ins.tipoInscripcion())) {
             errores.put("tipoInscripcion", "Seleccioná rutina o curso.");
+        } else if ("curso".equals(ins.tipoInscripcion())) {
+            requerido(errores, "idCurso", ins.idCurso());
+        } else {
+            requerido(errores, "objetivo", ins.objetivo());
         }
 
         if (!errores.isEmpty()) {
