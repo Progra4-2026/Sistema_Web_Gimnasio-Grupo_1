@@ -52,7 +52,7 @@ Core tables and relationships (see `database/GIMNASIO.sql` for full DDL):
 
 ### Frontend
 - `frontend/src/` is a minimal Vite + React SPA (`App.jsx`, entry `main.jsx`); currently just a placeholder page — this is where the real application UI (backed by the Spring Boot API) is meant to grow.
-- `frontend/public/*.html` (`main.html`, `servicios.html`, `contacto.html`, `blog.html`) plus their matching `*.css` and `global.css` are a **separate static HTML/CSS mockup** of the site ("Gimnasio PowerFit"), not wired into the React app or Vite's build/routing. Treat them as design reference/prototype pages, not live application code — don't assume changes there affect the SPA, and don't import them from React components.
+- `frontend/public/html/*.html` (`inicio.html`, `servicios.html`, `contacto.html`, `blog.html`), their matching stylesheets in `frontend/public/css/` (plus `global.css`) and images in `frontend/public/assets/` are a **separate static HTML/CSS mockup** of the site ("Gimnasio PowerFit"), not wired into the React app or Vite's build/routing. Treat them as design reference/prototype pages, not live application code — don't assume changes there affect the SPA, and don't import them from React components. They are served by the Vite dev server at `http://localhost:5173/html/<page>.html`; a wrong path (e.g. the old `/main.html`) silently falls back to `index.html` and shows the React app instead of a 404.
 - No client-side router or API client is set up yet; there are no calls from the React app to the backend API.
 
 ## Workflow

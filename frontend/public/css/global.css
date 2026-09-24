@@ -493,3 +493,21 @@ fieldset.formulario legend {
   opacity: 0.65;
   cursor: wait;
 }
+
+/* Botón con apariencia de enlace (Mostrar / Ocultar contraseña) */
+.boton-texto {
+  align-self: flex-start;
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--color-primario-oscuro);
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.boton-texto:hover,
+.boton-texto:focus {
+  text-decoration: underline;
+}

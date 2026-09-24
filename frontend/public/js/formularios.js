@@ -68,3 +68,81 @@ export function estadoEnviando(boton, enviando, textoEnviando = 'Enviando...') {
         boton.removeAttribute('aria-busy');
     }
 }
+
+/**
+ * Crea un bloque .campo-formulario (label + control) listo para insertar en el DOM.
+ * @param {string} etiqueta texto del label
+ * @param {HTMLElement} control input, select o textarea ya configurado (con id)
+ */
+export function crearCampo(etiqueta, control) {
+    const contenedor = document.createElement('div');
+    contenedor.className = 'campo-formulario';
+
+    const label = document.createElement('label');
+    label.htmlFor = control.id;
+    label.textContent = `${etiqueta} `;
+    if (control.required) {
+        const obligatorio = document.createElement('span');
+        obligatorio.className = 'obligatorio';
+        obligatorio.textContent = '*';
+        label.appendChild(obligatorio);
+    }
+
+    contenedor.append(label, control);
+    return contenedor;
+}
+
+/** Crea un <select> con una opción vacía inicial y las opciones [valor, texto] recibidas. */
+export function crearSelect({ id, name, required = false, textoVacio = 'Seleccione una opción', opciones = [] }) {
+    const select = document.createElement('select');
+    select.id = id;
+    select.name = name;
+    select.required = required;
+    llenarSelect(select, opciones, textoVacio);
+    return select;
+}
+
+/** Reemplaza las opciones de un <select>, conservando el valor elegido si sigue existiendo. */
+export function llenarSelect(select, opciones, textoVacio = 'Seleccione una opción') {
+    const valorActual = select.value;
+    const nuevas = [new Option(textoVacio, '')];
+    for (const { valor, texto, deshabilitada = false } of opciones) {
+        const opcion = new Option(texto, valor);
+        opcion.disabled = deshabilitada;
+        nuevas.push(opcion);
+    }
+    select.replaceChildren(...nuevas);
+    select.value = valorActual;
+    if (select.selectedIndex === -1) select.value = '';
+}
+
+/**
+ * Agrega un botón "Mostrar / Ocultar" a cada campo de contraseña del formulario.
+ * Evento click: alterna el type del input entre password y text.
+ */
+export function activarMostrarPassword(formulario) {
+    for (const campo of formulario.querySelectorAll('input[type="password"]')) {
+        const boton = document.createElement('button');
+        boton.type = 'button';
+        boton.className = 'boton-texto';
+        boton.textContent = 'Mostrar contraseña';
+        boton.setAttribute('aria-controls', campo.id);
+        boton.setAttribute('aria-pressed', 'false');
+
+        boton.addEventListener('click', () => {
+            const visible = campo.type === 'password';
+            campo.type = visible ? 'text' : 'password';
+            boton.textContent = visible ? 'Ocultar contraseña' : 'Mostrar contraseña';
+            boton.setAttribute('aria-pressed', String(visible));
+        });
+
+        // Al limpiar el formulario la contraseña vuelve a ocultarse
+        formulario.addEventListener('reset', () => {
+            campo.type = 'password';
+            boton.textContent = 'Mostrar contraseña';
+            boton.setAttribute('aria-pressed', 'false');
+        });
+
+        campo.after(boton);
+    }
+}
