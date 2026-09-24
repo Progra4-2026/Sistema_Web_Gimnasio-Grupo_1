@@ -72,10 +72,14 @@ Deberías ver el componente principal mostrando **"Sistema Web Gimnasio - Grupo 
 ## 5. Ver las páginas estáticas (Entregable 2)
 
 Con el mismo servidor de Vite corriendo (`npm run dev`), las páginas HTML5/CSS3 del Entregable 2 se sirven directamente desde `frontend/public/`, sin pasar por React:
-- http://localhost:5173/inicio.html
-- http://localhost:5173/blog.html
-- http://localhost:5173/contacto.html
-- http://localhost:5173/servicios.html
+- http://localhost:5173/html/inicio.html
+- http://localhost:5173/html/blog.html
+- http://localhost:5173/html/contacto.html
+- http://localhost:5173/html/servicios.html
+
+Estructura: los HTML están en `frontend/public/html/`, los estilos en `frontend/public/css/` y las imágenes en `frontend/public/assets/`.
+
+> **Nota:** si abrís una ruta que no existe (por ejemplo la vieja `/main.html` o `/inicio.html` sin `/html/`), Vite no da 404 sino que devuelve `index.html` y vas a ver la app de React en lugar de la página estática.
 
 
 Estas páginas son independientes del SPA de React — conviven en el mismo repositorio pero no comparten código ni build.
