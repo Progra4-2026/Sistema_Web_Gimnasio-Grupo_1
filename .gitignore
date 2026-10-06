@@ -6,3 +6,6 @@ __MACOSX/
 .idea/dataSources.local.xml
 .idea/workspace.xml
 .idea/**/.DS_Store
+
+# Credenciales locales (ver backend/.env.example)
+.env
