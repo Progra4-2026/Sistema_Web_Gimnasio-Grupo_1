@@ -1,5 +1,6 @@
 package com.grupo1.gimnasio.gimnasio_backend.config;
 
+import com.grupo1.gimnasio.gimnasio_backend.controllers.Encabezados;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -7,6 +8,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 /**
  * Permite que las páginas servidas por Vite (puerto 5173) o por Apache/XAMPP
  * (puerto 80) consuman la API REST en el puerto 8080 mediante fetch.
+ * allowCredentials(true) deja pasar la cookie de sesión (JSESSIONID) del login.
  */
 @Configuration
 public class CorsConfig implements WebMvcConfigurer {
@@ -20,6 +22,8 @@ public class CorsConfig implements WebMvcConfigurer {
                         "http://localhost",
                         "http://127.0.0.1")
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                .allowedHeaders("Content-Type", "Accept");
+                .allowedHeaders("Content-Type", "Accept")
+                .exposedHeaders("Location", Encabezados.REGISTROS_ELIMINADOS)
+                .allowCredentials(true);
     }
 }

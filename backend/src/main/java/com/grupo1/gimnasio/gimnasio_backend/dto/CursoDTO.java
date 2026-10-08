@@ -1,5 +1,9 @@
 package com.grupo1.gimnasio.gimnasio_backend.dto;
 
-/** Datos de un curso tal como los consume el frontend (GET /api/cursos). */
-public record CursoDTO(int id, String descripcion, String detalle, String horario, int cupos, String imagen) {
+/**
+ * Curso tal como lo envía y recibe la API (GET/POST/PUT /api/cursos).
+ * En POST el id lo asigna el servidor; en PUT no se permite cambiarlo.
+ */
+public record CursoDTO(Integer id, String descripcion, String detalle, String horario,
+                       Integer cupos, String imagen) {
 }
