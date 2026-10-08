@@ -1,70 +1,86 @@
 package com.grupo1.gimnasio.gimnasio_backend.controllers;
 
 import com.grupo1.gimnasio.gimnasio_backend.dto.InscripcionDTO;
-import org.springframework.http.HttpStatus;
+import com.grupo1.gimnasio.gimnasio_backend.dto.InscripcionRespuestaDTO;
+import com.grupo1.gimnasio.gimnasio_backend.dto.ResultadoOperacionDTO;
+import com.grupo1.gimnasio.gimnasio_backend.services.AutenticacionService;
+import com.grupo1.gimnasio.gimnasio_backend.services.InscripcionService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.net.URI;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
-import static com.grupo1.gimnasio.gimnasio_backend.controllers.ValidacionBasica.*;
 
 /**
- * POST /api/inscripciones — Recibe el formulario de Inscripción.
- * 201 Created, 400 Bad Request (datos inválidos) o 409 Conflict (cédula ya inscrita).
- * TEMPORAL (Entregable 3): las cédulas se guardan en memoria para demostrar el 409;
- * en el Entregable 4 se persiste con JPA y la contraseña se cifra con BCrypt.
+ * CRUD de inscripciones — /api/inscripciones
+ *
+ *   GET    /api/inscripciones            200 lista (sin contraseñas)
+ *   GET    /api/inscripciones/mia        200 la del usuario en sesión | 401 sin sesión
+ *   GET    /api/inscripciones/{cedula}   200 | 404
+ *   POST   /api/inscripciones            201 + Location | 400 | 404 (curso) | 409 (cédula duplicada / sin cupos)
+ *   PUT    /api/inscripciones/{cedula}   200 | 400 (intenta cambiar PK/FK) | 404
+ *   DELETE /api/inscripciones/{cedula}   204 (desinscribirse) | 404
  */
 @RestController
 @RequestMapping("/api/inscripciones")
-public class InscripcionController {
+public class InscripcionController extends ControladorBase {
 
-    private final Set<String> cedulasInscritas = ConcurrentHashMap.newKeySet();
+    private final InscripcionService inscripcionService;
+    private final AutenticacionService autenticacionService;
+
+    public InscripcionController(InscripcionService inscripcionService, AutenticacionService autenticacionService) {
+        this.inscripcionService = inscripcionService;
+        this.autenticacionService = autenticacionService;
+    }
+
+    @GetMapping
+    public List<InscripcionRespuestaDTO> listar() {
+        return inscripcionService.listar();
+    }
+
+    /** Ejemplo de uso de la HttpSession: el cliente solo ve su propia inscripción. */
+    @GetMapping("/mia")
+    public InscripcionRespuestaDTO mia(HttpSession sesion) {
+        String cedula = autenticacionService.usuarioActual(sesion).cedula();
+        return inscripcionService.obtener(cedula);
+    }
+
+    @GetMapping("/{cedula}")
+    public InscripcionRespuestaDTO obtener(@PathVariable String cedula) {
+        return inscripcionService.obtener(cedula);
+    }
 
     @PostMapping
-    public ResponseEntity<Map<String, Object>> crear(@RequestBody InscripcionDTO ins) {
-        Map<String, String> errores = new LinkedHashMap<>();
-        requerido(errores, "nombre", ins.nombre());
-        longitud(errores, "nombre", ins.nombre(), 3, 80);
-        requerido(errores, "cedula", ins.cedula());
-        patron(errores, "cedula", ins.cedula(), CEDULA, "La cédula debe tener entre 9 y 12 dígitos.");
-        requerido(errores, "email", ins.email());
-        patron(errores, "email", ins.email(), EMAIL, "Correo electrónico inválido.");
-        requerido(errores, "telefono", ins.telefono());
-        patron(errores, "telefono", ins.telefono(), TELEFONO, "El teléfono debe tener 8 dígitos.");
-        requerido(errores, "fechaNacimiento", ins.fechaNacimiento());
-        requerido(errores, "password", ins.password());
-        if (!vacio(ins.password()) && ins.password().length() < 8) {
-            errores.put("password", "La contraseña debe tener al menos 8 caracteres.");
-        }
-        if (vacio(ins.tipoInscripcion()) || !Set.of("rutina", "curso").contains(ins.tipoInscripcion())) {
-            errores.put("tipoInscripcion", "Seleccioná rutina o curso.");
-        } else if ("curso".equals(ins.tipoInscripcion())) {
-            requerido(errores, "idCurso", ins.idCurso());
-        } else {
-            requerido(errores, "objetivo", ins.objetivo());
-        }
+    public ResponseEntity<Map<String, Object>> crear(@RequestBody InscripcionDTO datos) {
+        InscripcionRespuestaDTO creada = inscripcionService.crear(datos);
+        String detalle = "curso".equals(creada.tipoInscripcion()) ? "un curso grupal" : "una rutina personalizada";
 
-        if (!errores.isEmpty()) {
-            return ResponseEntity.badRequest().body(cuerpoError("Algunos datos no son válidos.", errores));
-        }
+        Map<String, Object> cuerpo = new LinkedHashMap<>();
+        cuerpo.put("mensaje", "¡Bienvenido/a, " + creada.nombre() + "! Tu inscripción a " + detalle + " quedó registrada.");
+        cuerpo.put("inscripcion", creada);
+        return ResponseEntity.created(URI.create("/api/inscripciones/" + creada.cedula())).body(cuerpo);
+    }
 
-        String cedula = ins.cedula().trim();
-        if (!cedulasInscritas.add(cedula)) {
-            return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body(cuerpoError("Ya existe una inscripción con la cédula " + cedula + ".", null));
-        }
+    @PutMapping("/{cedula}")
+    public ResultadoOperacionDTO<InscripcionRespuestaDTO> actualizar(@PathVariable String cedula,
+                                                                     @RequestBody InscripcionDTO cambios) {
+        InscripcionRespuestaDTO actualizada = inscripcionService.actualizar(cedula, cambios);
+        return new ResultadoOperacionDTO<>("Inscripción actualizada correctamente.", 1, actualizada);
+    }
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
-                "cedula", cedula,
-                "mensaje", "¡Bienvenido/a, " + ins.nombre().trim() + "! Tu inscripción a "
-                        + ("curso".equals(ins.tipoInscripcion()) ? "un curso grupal" : "una rutina personalizada")
-                        + " quedó registrada."));
+    @DeleteMapping("/{cedula}")
+    public ResponseEntity<Void> eliminar(@PathVariable String cedula) {
+        inscripcionService.eliminar(cedula);
+        return ResponseEntity.noContent().header(Encabezados.REGISTROS_ELIMINADOS, "1").build();
     }
 }
