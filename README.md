@@ -62,13 +62,23 @@ Deberías ver: `cliente`, `cursos`, `Curso_cliente`, `historial_curso`, `instruc
 ## 3. Levantar el backend (Spring Boot)
 
 1. Abrí la carpeta `backend/` con IntelliJ (`File → Open`).
-2. Verificá/editá `backend/src/main/resources/application.properties` con las credenciales de tu MySQL local:
+2. Configurá las credenciales de tu MySQL local. **No edites `application.properties`**: el backend las lee de un archivo `backend/.env`, que no se sube al repositorio.
+   - Si tu MySQL usa usuario `root` con contraseña `root`, no tenés que hacer nada: son los valores por defecto.
+   - Si no, copiá la plantilla y poné tus datos:
 
-```properties
-   spring.datasource.url=jdbc:mysql://localhost:3306/gimnasio_db
-   spring.datasource.username=root
-   spring.datasource.password=TU_PASSWORD
+```bash
+cp backend/.env.example backend/.env
 ```
+
+   Contenido de `backend/.env`:
+
+```
+DB_URL=jdbc:mysql://localhost:3306/gimnasio_db
+DB_USER=root
+DB_PASSWORD=tu_contraseña_de_mysql
+```
+
+   > El `.env` tiene que estar dentro de `backend/`, porque el backend lo busca en la carpeta desde donde se ejecuta. Por eso en el paso 1 se abre `backend/` en IntelliJ, no la raíz del proyecto.
 
 3. Dejá que IntelliJ descargue las dependencias de Maven (barra de progreso inferior).
 4. Ejecutá la clase principal `GimnasioBackendApplication.java` (botón ▶️ o `Run`).
