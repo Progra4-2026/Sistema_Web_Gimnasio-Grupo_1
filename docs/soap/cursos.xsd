@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Contrato (XSD) del servicio SOAP de cursos.
+  A partir de este esquema Spring Web Services publica el WSDL en http://localhost:8080/ws/cursos.wsdl.
+  Operaciones: obtenerCurso (por id) y listarCursos.
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:tns="http://grupo1.gimnasio.com/soap/cursos"
+           targetNamespace="http://grupo1.gimnasio.com/soap/cursos"
+           elementFormDefault="qualified">
+
+    <!-- Datos de un curso -->
+    <xs:complexType name="cursoSoap">
+        <xs:sequence>
+            <xs:element name="id" type="xs:int"/>
+            <xs:element name="descripcion" type="xs:string"/>
+            <xs:element name="detalle" type="xs:string" minOccurs="0"/>
+            <xs:element name="horario" type="xs:string"/>
+            <xs:element name="cupos" type="xs:int"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- Operación obtenerCurso -->
+    <xs:element name="obtenerCursoRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="id" type="xs:int"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="obtenerCursoResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="curso" type="tns:cursoSoap"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- Operación listarCursos -->
+    <xs:element name="listarCursosRequest">
+        <xs:complexType>
+            <xs:sequence/>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="listarCursosResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="curso" type="tns:cursoSoap" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>

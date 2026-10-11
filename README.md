@@ -163,6 +163,8 @@ Estas páginas son independientes del SPA de React — conviven en el mismo repo
 | GET | `/api/consultas` | Lista de consultas de Contactos |
 | POST | `/api/consultas` | Recibe el formulario de Contactos. `201` o `400` |
 
+**Servicio SOAP** (ejemplo para comparar con REST): `POST /ws`, WSDL en `http://localhost:8080/ws/cursos.wsdl`, operaciones `obtenerCurso` y `listarCursos`. Documentación, WSDL y XSD en [`docs/soap/`](docs/soap/README.md).
+
 Los errores siempre responden JSON con `{"mensaje": "...", "errores": {campo: mensaje}}`, sin trazas ni errores de MySQL.
 
 ## Backend: estructura y patrones (Entregable 4)
@@ -179,6 +181,7 @@ Paquetes en `backend/src/main/java/com/grupo1/gimnasio/gimnasio_backend/`:
 | `exceptions/` | Excepciones de negocio y el manejador central `@RestControllerAdvice` |
 | `observer/` | Patrón Observer de las inscripciones |
 | `sesion/` | Registro de sesiones HTTP (Singleton) |
+| `soap/` | Servicio SOAP de cursos (endpoint y clases JAXB del XSD) |
 
 | Patrón | Dónde |
 |---|---|
