@@ -1,5 +1,6 @@
 package com.grupo1.gimnasio.gimnasio_backend.controllers;
 
+import jakarta.validation.Valid;
 import com.grupo1.gimnasio.gimnasio_backend.dto.LoginDTO;
 import com.grupo1.gimnasio.gimnasio_backend.dto.UsuarioSesionDTO;
 import com.grupo1.gimnasio.gimnasio_backend.services.AutenticacionService;
@@ -25,7 +26,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("/api/auth")
-public class AutenticacionController extends ControladorBase {
+public class AutenticacionController {
 
     private final AutenticacionService autenticacionService;
 
@@ -34,7 +35,7 @@ public class AutenticacionController extends ControladorBase {
     }
 
     @PostMapping("/login")
-    public Map<String, Object> login(@RequestBody LoginDTO credenciales, HttpServletRequest peticion) {
+    public Map<String, Object> login(@Valid @RequestBody LoginDTO credenciales, HttpServletRequest peticion) {
         UsuarioSesionDTO usuario = autenticacionService.iniciarSesion(credenciales, peticion);
         return Map.of("mensaje", "Sesión iniciada. ¡Hola, " + usuario.nombre() + "!", "usuario", usuario);
     }

@@ -39,7 +39,10 @@ docs/        # Course deliverables (charter, data model)
 ## Architecture
 
 ### Backend
-- Standard Spring Boot layout under `com.grupo1.gimnasio.gimnasio_backend`, with a `controllers` package for `@RestController` classes (currently just `HealthController`). No service/repository/entity layers exist yet — when adding JPA entities for `cliente`, `instructores`, `cursos`, `maquinas`, `rutinas`, `historial_curso`, mirror the schema in `database/GIMNASIO.sql`.
+- Layered Spring Boot app under `com.grupo1.gimnasio.gimnasio_backend`: `controllers/` (REST) → `services/` interfaces + `services/impl/` → `repositories/` (`JpaRepository`) → `models/` (JPA entities mirroring `database/GIMNASIO.sql`). `dto/` holds API records with Bean Validation annotations; `exceptions/` holds `ApiException` subclasses (each carries its HTTP status) and the central `@RestControllerAdvice` (`ManejadorGlobalExcepciones`).
+- Course-required design patterns are named in code comments: Singleton (`sesion/GestorSesiones`, `@Scope(SINGLETON)` services), Observer (`observer/PublicadorInscripciones` notifies `ObservadorInscripciones` beans on inscription/unsubscription), Iterator (`listar()` in `CursoServiceImpl` / `InscripcionServiceImpl`).
+- The `/api/inscripciones` API stores into `cliente` + `credenciales`: the full name is split into `nombre`/`apellido_1`/`apellido_2`, the phone goes to `celular`, and passwords are stored only as PBKDF2 hash+salt (`HashContrasenas`). Login uses `HttpSession`.
+- Schema changes go in `database/GIMNASIO.sql` (section h holds the web-app columns/tables, added after the seed inserts because those inserts are positional). Keep entity `@Column` lengths/types in sync with the script: with `ddl-auto=update` Hibernate will ALTER columns that differ.
 - `spring.jpa.hibernate.ddl-auto=update` in `application.properties` — Hibernate will alter the schema to match entities on startup, so entity field types/constraints should stay consistent with the SQL script to avoid drift.
 - DB credentials are read from `backend/src/main/resources/application.properties` (local MySQL, currently `root`/`root`) — not committed with real secrets, but do not hardcode credentials elsewhere.
 
@@ -52,8 +55,8 @@ Core tables and relationships (see `database/GIMNASIO.sql` for full DDL):
 
 ### Frontend
 - `frontend/src/` is a minimal Vite + React SPA (`App.jsx`, entry `main.jsx`); currently just a placeholder page — this is where the real application UI (backed by the Spring Boot API) is meant to grow.
-- `frontend/public/html/*.html` (`inicio.html`, `servicios.html`, `contacto.html`, `blog.html`), their matching stylesheets in `frontend/public/css/` (plus `global.css`) and images in `frontend/public/assets/` are a **separate static HTML/CSS mockup** of the site ("Gimnasio PowerFit"), not wired into the React app or Vite's build/routing. Treat them as design reference/prototype pages, not live application code — don't assume changes there affect the SPA, and don't import them from React components. They are served by the Vite dev server at `http://localhost:5173/html/<page>.html`; a wrong path (e.g. the old `/main.html`) silently falls back to `index.html` and shows the React app instead of a 404.
-- No client-side router or API client is set up yet; there are no calls from the React app to the backend API.
+- `frontend/public/html/*.html` (`inicio.html`, `servicios.html`, `contacto.html`, `blog.html`), their stylesheets in `frontend/public/css/`, images in `frontend/public/assets/` and JS modules in `frontend/public/js/` are the multi-page site ("Gimnasio PowerFit") from Entregables 2–3. They are not part of the React app or Vite's build/routing — don't assume changes there affect the SPA, and don't import them from React components. They are served by the Vite dev server at `http://localhost:5173/html/<page>.html`; a wrong path (e.g. the old `/main.html`) silently falls back to `index.html` and shows the React app instead of a 404.
+- The React app has no router or API client yet. The pages in `frontend/public/html/` do call the backend through the ES6 modules in `frontend/public/js/` (`api.js` uses `fetch` with `credentials: 'include'` for the session cookie).
 
 ## Workflow
 

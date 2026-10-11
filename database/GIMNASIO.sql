@@ -4,11 +4,16 @@
 -- Base: modelo de datos de referencia (Práctica original)
 -- ============================================================
 
+-- El archivo está en UTF-8: sin esto, las tildes de los datos de prueba se guardan mal
+SET NAMES utf8mb4;
+
 DROP DATABASE IF EXISTS gimnasio_db;
-CREATE DATABASE gimnasio_db;
+CREATE DATABASE gimnasio_db CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
 USE gimnasio_db;
 
 -- Limpieza previa (orden inverso a las dependencias, por las FK)
+DROP TABLE IF EXISTS consultas;
+DROP TABLE IF EXISTS credenciales;
 DROP TABLE IF EXISTS historial_curso;
 DROP TABLE IF EXISTS rutinas;
 DROP TABLE IF EXISTS cliente;
@@ -18,21 +23,24 @@ DROP TABLE IF EXISTS maquinas;
 
 -- ============================================================
 -- b. Creación de tablas
+-- Las llaves son BIGINT para coincidir con las entidades JPA (Long);
+-- las que no escribe el usuario son AUTO_INCREMENT (@GeneratedValue IDENTITY).
+-- La cédula del cliente no es autoincremental: la ingresa el usuario.
 -- ============================================================
 
 CREATE TABLE cliente (
-   cedula INT NOT NULL,
+   cedula BIGINT NOT NULL,
    nombre VARCHAR(30) NOT NULL,
    apellido_1 VARCHAR(30) NOT NULL,
    apellido_2 VARCHAR(30) NOT NULL,
    direccion VARCHAR(50),
-   e_mail VARCHAR(30),
+   e_mail VARCHAR(100),
    fecha_inscripcion DATE NOT NULL,
    CONSTRAINT pkcliente PRIMARY KEY (cedula)
 );
 
 CREATE TABLE instructores (
-    cod_instructor INT NOT NULL,
+    cod_instructor BIGINT NOT NULL AUTO_INCREMENT,
     nombre VARCHAR(30) NOT NULL,
     apellido_1 VARCHAR(30) NOT NULL,
     apellido_2 VARCHAR(30) NOT NULL,
@@ -45,32 +53,32 @@ CREATE TABLE instructores (
 );
 
 CREATE TABLE cursos (
-    id_curso INT NOT NULL,
+    id_curso BIGINT NOT NULL AUTO_INCREMENT,
     descripcion VARCHAR(50) NOT NULL,
     CONSTRAINT pkcursos PRIMARY KEY (id_curso)
 );
 
 CREATE TABLE maquinas (
-    id_maquina INT NOT NULL,
+    id_maquina BIGINT NOT NULL AUTO_INCREMENT,
     descripcion VARCHAR(50) NOT NULL,
     CONSTRAINT pkmaquinas PRIMARY KEY (id_maquina)
 );
 
 CREATE TABLE rutinas (
-    id_rutina INT NOT NULL,
-    cliente INT NOT NULL,
-    instructor INT NOT NULL,
-    maquina INT NOT NULL,
+    id_rutina BIGINT NOT NULL AUTO_INCREMENT,
+    cliente BIGINT NOT NULL,
+    instructor BIGINT NOT NULL,
+    maquina BIGINT NOT NULL,
     fecha DATE NOT NULL,
     horas INT NOT NULL,
     CONSTRAINT pkrutinas PRIMARY KEY (id_rutina)
 );
 
 CREATE TABLE historial_curso (
-    id_historial INT NOT NULL,
-    cliente INT NOT NULL,
-    instructor INT NOT NULL,
-    curso INT NOT NULL,
+    id_historial BIGINT NOT NULL AUTO_INCREMENT,
+    cliente BIGINT NOT NULL,
+    instructor BIGINT NOT NULL,
+    curso BIGINT NOT NULL,
     fecha DATE NOT NULL,
     horas INT NOT NULL,
     CONSTRAINT pkhistorial_curso PRIMARY KEY (id_historial),
@@ -200,6 +208,53 @@ INSERT INTO rutinas VALUES (25,213,107,52,'2008-05-10',2);
 INSERT INTO rutinas VALUES (27,210,107,53,'2008-05-10',2);
 INSERT INTO rutinas VALUES (29,201,107,54,'2008-05-10',2);
 INSERT INTO rutinas VALUES (31,202,105,55,'2008-05-10',2);
+
+-- ============================================================
+-- h. Tablas y columnas de la aplicación web (Entregable 4)
+-- Se agregan después de los datos de prueba porque los INSERT
+-- de arriba no indican columnas (dependen del orden original).
+-- ============================================================
+
+-- Cursos: datos que muestra la página Servicios
+ALTER TABLE cursos ADD COLUMN detalle VARCHAR(300);
+ALTER TABLE cursos ADD COLUMN horario VARCHAR(60) NOT NULL DEFAULT 'Por definir';
+ALTER TABLE cursos ADD COLUMN cupos INT NOT NULL DEFAULT 15;
+ALTER TABLE cursos ADD COLUMN imagen VARCHAR(100) NOT NULL DEFAULT 'clases_grupales.jpg';
+
+UPDATE cursos SET detalle = 'Ejercicios de flexibilidad, respiración y relajación.', horario = 'Mar/Jue, 7:00 p.m.', cupos = 12, imagen = 'clase_yoga.jpg' WHERE id_curso = 1;
+UPDATE cursos SET detalle = 'Técnicas básicas de defensa personal.', horario = 'Lun/Mié, 6:00 p.m.', cupos = 10 WHERE id_curso = 2;
+UPDATE cursos SET detalle = 'Entrenamiento de alta intensidad con golpes y patadas.', horario = 'Mar/Jue, 6:00 a.m.', cupos = 0, imagen = 'clase_crossfit.jpg' WHERE id_curso = 3;
+UPDATE cursos SET detalle = 'Clase cardiovascular en bicicleta estática.', horario = 'Lun/Mié/Vie, 6:00 a.m.', cupos = 8, imagen = 'clase_spinning.jpg' WHERE id_curso = 4;
+UPDATE cursos SET detalle = 'Aeróbicos con movimientos de artes marciales.', horario = 'Vie, 5:30 p.m.', cupos = 15 WHERE id_curso = 5;
+UPDATE cursos SET detalle = 'Baile y ejercicio cardiovascular para todos los niveles.', horario = 'Sáb, 9:00 a.m.', cupos = 20 WHERE id_curso = 6;
+
+-- Cliente: datos de la inscripción web
+ALTER TABLE cliente ADD COLUMN fecha_nacimiento DATE;
+ALTER TABLE cliente ADD COLUMN tipo_inscripcion VARCHAR(10);
+ALTER TABLE cliente ADD COLUMN objetivo VARCHAR(20);
+ALTER TABLE cliente ADD COLUMN curso_inscrito BIGINT;
+ALTER TABLE cliente ADD CONSTRAINT fkcliente_curso FOREIGN KEY (curso_inscrito) REFERENCES cursos (id_curso);
+
+-- Credenciales de acceso: relación 1 a 1 con cliente (comparten la cédula).
+-- La contraseña se guarda cifrada con hash + salt, nunca en texto plano.
+CREATE TABLE credenciales (
+    cedula BIGINT NOT NULL,
+    password_hash VARCHAR(100) NOT NULL,
+    CONSTRAINT pkcredenciales PRIMARY KEY (cedula),
+    CONSTRAINT fkcredenciales_cliente FOREIGN KEY (cedula) REFERENCES cliente (cedula)
+);
+
+-- Consultas enviadas desde el formulario de Contactos
+CREATE TABLE consultas (
+    id_consulta BIGINT NOT NULL AUTO_INCREMENT,
+    nombre VARCHAR(80) NOT NULL,
+    e_mail VARCHAR(100) NOT NULL,
+    telefono VARCHAR(9) NOT NULL,
+    asunto VARCHAR(20) NOT NULL,
+    mensaje VARCHAR(500) NOT NULL,
+    fecha DATETIME NOT NULL,
+    CONSTRAINT pkconsultas PRIMARY KEY (id_consulta)
+);
 
 
 -- ============================================================

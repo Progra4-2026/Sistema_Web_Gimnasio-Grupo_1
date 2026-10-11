@@ -1,5 +1,10 @@
 package com.grupo1.gimnasio.gimnasio_backend.controllers;
 
+import com.grupo1.gimnasio.gimnasio_backend.dto.AlCrear;
+import com.grupo1.gimnasio.gimnasio_backend.observer.EstadisticasInscripciones;
+import jakarta.validation.Valid;
+import jakarta.validation.groups.Default;
+import org.springframework.validation.annotation.Validated;
 import com.grupo1.gimnasio.gimnasio_backend.dto.InscripcionDTO;
 import com.grupo1.gimnasio.gimnasio_backend.dto.InscripcionRespuestaDTO;
 import com.grupo1.gimnasio.gimnasio_backend.dto.ResultadoOperacionDTO;
@@ -26,21 +31,25 @@ import java.util.Map;
  *
  *   GET    /api/inscripciones            200 lista (sin contraseñas)
  *   GET    /api/inscripciones/mia        200 la del usuario en sesión | 401 sin sesión
+ *   GET    /api/inscripciones/estadisticas  200 conteo que lleva el Observer EstadisticasInscripciones
  *   GET    /api/inscripciones/{cedula}   200 | 404
  *   POST   /api/inscripciones            201 + Location | 400 | 404 (curso) | 409 (cédula duplicada / sin cupos)
  *   PUT    /api/inscripciones/{cedula}   200 | 400 (intenta cambiar PK/FK) | 404
- *   DELETE /api/inscripciones/{cedula}   204 (desinscribirse) | 404
+ *   DELETE /api/inscripciones/{cedula}   204 (desinscribirse) | 404 | 409 (tiene rutinas o historial)
  */
 @RestController
 @RequestMapping("/api/inscripciones")
-public class InscripcionController extends ControladorBase {
+public class InscripcionController {
 
     private final InscripcionService inscripcionService;
     private final AutenticacionService autenticacionService;
+    private final EstadisticasInscripciones estadisticasInscripciones;
 
-    public InscripcionController(InscripcionService inscripcionService, AutenticacionService autenticacionService) {
+    public InscripcionController(InscripcionService inscripcionService, AutenticacionService autenticacionService,
+                                 EstadisticasInscripciones estadisticasInscripciones) {
         this.inscripcionService = inscripcionService;
         this.autenticacionService = autenticacionService;
+        this.estadisticasInscripciones = estadisticasInscripciones;
     }
 
     @GetMapping
@@ -55,13 +64,19 @@ public class InscripcionController extends ControladorBase {
         return inscripcionService.obtener(cedula);
     }
 
+    /** Patrón Observer: datos que lleva el observador EstadisticasInscripciones. */
+    @GetMapping("/estadisticas")
+    public Map<String, Object> estadisticas() {
+        return estadisticasInscripciones.resumen();
+    }
+
     @GetMapping("/{cedula}")
     public InscripcionRespuestaDTO obtener(@PathVariable String cedula) {
         return inscripcionService.obtener(cedula);
     }
 
     @PostMapping
-    public ResponseEntity<Map<String, Object>> crear(@RequestBody InscripcionDTO datos) {
+    public ResponseEntity<Map<String, Object>> crear(@Validated({Default.class, AlCrear.class}) @RequestBody InscripcionDTO datos) {
         InscripcionRespuestaDTO creada = inscripcionService.crear(datos);
         String detalle = "curso".equals(creada.tipoInscripcion()) ? "un curso grupal" : "una rutina personalizada";
 
@@ -73,7 +88,7 @@ public class InscripcionController extends ControladorBase {
 
     @PutMapping("/{cedula}")
     public ResultadoOperacionDTO<InscripcionRespuestaDTO> actualizar(@PathVariable String cedula,
-                                                                     @RequestBody InscripcionDTO cambios) {
+                                                                     @Valid @RequestBody InscripcionDTO cambios) {
         InscripcionRespuestaDTO actualizada = inscripcionService.actualizar(cedula, cambios);
         return new ResultadoOperacionDTO<>("Inscripción actualizada correctamente.", 1, actualizada);
     }

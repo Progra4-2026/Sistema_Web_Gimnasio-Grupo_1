@@ -1,5 +1,6 @@
 package com.grupo1.gimnasio.gimnasio_backend.controllers;
 
+import jakarta.validation.Valid;
 import com.grupo1.gimnasio.gimnasio_backend.dto.ConsultaDTO;
 import com.grupo1.gimnasio.gimnasio_backend.services.ConsultaService;
 import org.springframework.http.HttpStatus;
@@ -21,7 +22,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("/api/consultas")
-public class ConsultaController extends ControladorBase {
+public class ConsultaController {
 
     private final ConsultaService consultaService;
 
@@ -35,7 +36,7 @@ public class ConsultaController extends ControladorBase {
     }
 
     @PostMapping
-    public ResponseEntity<Map<String, Object>> crear(@RequestBody ConsultaDTO consulta) {
+    public ResponseEntity<Map<String, Object>> crear(@Valid @RequestBody ConsultaDTO consulta) {
         return ResponseEntity.status(HttpStatus.CREATED).body(consultaService.crear(consulta));
     }
 }
