@@ -69,6 +69,7 @@ async function peticion(ruta, { metodo = 'GET', cuerpo } = {}) {
                 ...(cuerpo !== undefined && { 'Content-Type': 'application/json' })
             },
             body: cuerpo !== undefined ? JSON.stringify(cuerpo) : undefined,
+            credentials: 'include',   // envía la cookie de sesión (JSESSIONID) al backend
             signal: controlador.signal
         });
     } catch (error) {
