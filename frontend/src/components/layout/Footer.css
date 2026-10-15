@@ -1,0 +1,44 @@
+.pie-sitio {
+  background: var(--color-secundario, #1a1a2e);
+  color: #fff;
+  margin-top: 3rem;
+  padding: 2.5rem 0 1rem;
+}
+
+.pie-sitio__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+}
+
+.pie-sitio h2 {
+  color: #fff;
+  font-size: 1.1rem;
+  margin: 0 0 0.6rem;
+}
+
+.pie-sitio ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.pie-sitio a {
+  color: #d6d6e4;
+  text-decoration: none;
+}
+
+.pie-sitio a:hover {
+  color: #fff;
+  text-decoration: underline;
+}
+
+.derechos {
+  text-align: center;
+  color: #9d9dbd;
+  font-size: 0.85rem;
+  margin: 2rem 0 0;
+}
