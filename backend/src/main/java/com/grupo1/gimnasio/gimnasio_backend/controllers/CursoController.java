@@ -1,5 +1,6 @@
 package com.grupo1.gimnasio.gimnasio_backend.controllers;
 
+import jakarta.validation.Valid;
 import com.grupo1.gimnasio.gimnasio_backend.dto.CursoDTO;
 import com.grupo1.gimnasio.gimnasio_backend.dto.ResultadoOperacionDTO;
 import com.grupo1.gimnasio.gimnasio_backend.services.CursoService;
@@ -28,7 +29,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/cursos")
-public class CursoController extends ControladorBase {
+public class CursoController {
 
     private final CursoService cursoService;
 
@@ -47,13 +48,13 @@ public class CursoController extends ControladorBase {
     }
 
     @PostMapping
-    public ResponseEntity<CursoDTO> crear(@RequestBody CursoDTO curso) {
+    public ResponseEntity<CursoDTO> crear(@Valid @RequestBody CursoDTO curso) {
         CursoDTO creado = cursoService.crear(curso);
         return ResponseEntity.created(URI.create("/api/cursos/" + creado.id())).body(creado);
     }
 
     @PutMapping("/{id}")
-    public ResultadoOperacionDTO<CursoDTO> actualizar(@PathVariable int id, @RequestBody CursoDTO curso) {
+    public ResultadoOperacionDTO<CursoDTO> actualizar(@PathVariable int id, @Valid @RequestBody CursoDTO curso) {
         CursoDTO actualizado = cursoService.actualizar(id, curso);
         return new ResultadoOperacionDTO<>("Curso actualizado correctamente.", 1, actualizado);
     }
