@@ -1,28 +1,12 @@
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
-import { NotificationProvider } from './context/NotificationContext';
-import Layout from './components/layout/Layout';
-import InicioPage from './pages/InicioPage';
-import ServiciosPage from './pages/ServiciosPage';
-import ContactoPage from './pages/ContactoPage';
-import BlogPage from './pages/BlogPage';
+import './App.css'
 
-export default function App() {
+function App() {
   return (
-    <AuthProvider>
-      <NotificationProvider>
-        <BrowserRouter>
-          <Routes>
-            <Route element={<Layout />}>
-              <Route path="/" element={<InicioPage />} />
-              <Route path="/servicios" element={<ServiciosPage />} />
-              <Route path="/contacto" element={<ContactoPage />} />
-              <Route path="/blog" element={<BlogPage />} />
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Route>
-          </Routes>
-        </BrowserRouter>
-      </NotificationProvider>
-    </AuthProvider>
-  );
+      <div className="app-container">
+        <h1>Sistema Web Gimnasio - Grupo 1</h1>
+        <p>Proyecto de Programación 4</p>
+      </div>
+  )
 }
+
+export default App

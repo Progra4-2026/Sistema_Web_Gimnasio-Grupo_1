@@ -9,6 +9,3 @@ __MACOSX/
 
 # Credenciales locales (ver backend/.env.example)
 .env
-
-# Instrucciones locales para Claude Code (no forman parte del proyecto)
-CLAUDE.md
