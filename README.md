@@ -145,9 +145,52 @@ Estas páginas son independientes del SPA de React — conviven en el mismo repo
 | Método | Ruta | Descripción |
 |---|---|---|
 | GET | `/api/health` | Verifica que el backend esté activo. Responde `{"status":"ok"}` |
-| GET | `/api/cursos` | Lista de cursos (descripción, horario, cupos, imagen) |
-| POST | `/api/consultas` | Recibe el formulario de Contactos. `201` si es válido, `400` con los errores por campo si no |
-| POST | `/api/inscripciones` | Recibe el formulario de Inscripción. `201` si es válido, `400` si hay datos inválidos, `409` si la cédula ya está inscrita |
+| GET | `/api/cursos` | Lista de cursos |
+| GET | `/api/cursos/{id}` | Un curso. `404` si no existe |
+| POST | `/api/cursos` | Crea un curso. `201`, `400` (datos inválidos) o `409` (nombre repetido) |
+| PUT | `/api/cursos/{id}` | Actualiza un curso. `200`, `400`, `404` o `409` |
+| DELETE | `/api/cursos/{id}` | Elimina un curso. `204`, `404` o `409` (tiene inscritos o historial) |
+| GET | `/api/inscripciones` | Lista de clientes |
+| GET | `/api/inscripciones/{cedula}` | Un cliente. `404` si no existe |
+| GET | `/api/inscripciones/mia` | La inscripción del usuario con sesión iniciada. `401` sin sesión |
+| GET | `/api/inscripciones/estadisticas` | Conteo de inscripciones que lleva el Observer |
+| POST | `/api/inscripciones` | Inscribe un cliente. `201`, `400`, `404` (curso) o `409` (cédula repetida o curso sin cupos) |
+| PUT | `/api/inscripciones/{cedula}` | Actualiza datos de contacto. `200`, `400` o `404` |
+| DELETE | `/api/inscripciones/{cedula}` | Desinscribe. `204`, `404` o `409` (tiene rutinas o historial) |
+| POST | `/api/auth/login` | Inicia sesión (cédula y contraseña). `200` o `401` |
+| GET | `/api/auth/sesion` | Usuario con sesión iniciada. `401` sin sesión |
+| POST | `/api/auth/logout` | Cierra la sesión. `204` |
+| GET | `/api/consultas` | Lista de consultas de Contactos |
+| POST | `/api/consultas` | Recibe el formulario de Contactos. `201` o `400` |
+
+**Servicio SOAP** (ejemplo para comparar con REST): `POST /ws`, WSDL en `http://localhost:8080/ws/cursos.wsdl`, operaciones `obtenerCurso` y `listarCursos`. Documentación, WSDL y XSD en [`docs/soap/`](docs/soap/README.md).
+
+Los errores siempre responden JSON con `{"mensaje": "...", "errores": {campo: mensaje}}`, sin trazas ni errores de MySQL.
+
+## Backend: estructura y patrones (Entregable 4)
+
+Paquetes en `backend/src/main/java/com/grupo1/gimnasio/gimnasio_backend/`:
+
+| Paquete | Contenido |
+|---|---|
+| `controllers/` | Controladores REST (reciben las peticiones y devuelven JSON) |
+| `services/` y `services/impl/` | Interfaces de servicio y sus implementaciones (reglas de negocio) |
+| `repositories/` | Repositorios Spring Data JPA (`JpaRepository`) |
+| `models/` | Entidades JPA mapeadas a las tablas de `GIMNASIO.sql` |
+| `dto/` | Datos que entran y salen de la API, con validación (`@NotBlank`, `@Email`, `@Size`, `@Pattern`...) |
+| `exceptions/` | Excepciones de negocio y el manejador central `@RestControllerAdvice` |
+| `observer/` | Patrón Observer de las inscripciones |
+| `sesion/` | Registro de sesiones HTTP (Singleton) |
+| `soap/` | Servicio SOAP de cursos (endpoint y clases JAXB del XSD) |
+
+| Patrón | Dónde |
+|---|---|
+| MVC | `models/` (modelo), `controllers/` (controlador), JSON y páginas HTML (vista) |
+| Singleton | `sesion/GestorSesiones` (instancia única) y los servicios con `@Scope(SINGLETON)` |
+| Observer | `observer/PublicadorInscripciones` (Subject) avisa a `BitacoraInscripciones` y `EstadisticasInscripciones` en cada inscripción o desinscripción |
+| Iterator | `CursoServiceImpl.listar()` e `InscripcionServiceImpl.listar()` recorren las entidades con `java.util.Iterator` |
+
+> **Si ya tenías la base creada antes del Entregable 4**, volvé a ejecutar `database/GIMNASIO.sql` (paso 2): el script agrega columnas y tablas nuevas (`credenciales`, `consultas`) que el backend necesita.
 
 ## Flujo de trabajo en GitHub
 
