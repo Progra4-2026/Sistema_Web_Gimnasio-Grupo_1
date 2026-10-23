@@ -53,6 +53,12 @@ export default function Navbar() {
             ))}
           </ul>
 
+          {!usuario && (
+            <NavLink to="/login" className="boton boton-secundario" onClick={manejarClicEnlace}>
+              Iniciar sesión
+            </NavLink>
+          )}
+
           {usuario && (
             <div className="sesion-navbar">
               <span>Hola, {usuario.nombre}</span>

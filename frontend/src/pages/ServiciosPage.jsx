@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { listarCursos } from '../api/cursos';
+import { listarCursos } from '../services/cursos';
 import { useAuth } from '../context/AuthContext';
 import InscripcionForm from '../components/forms/InscripcionForm';
 import LoginForm from '../components/forms/LoginForm';

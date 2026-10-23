@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { eliminarInscripcion } from '../../api/inscripciones';
+import { eliminarInscripcion } from '../../services/inscripciones';
 import { useNotificacion } from '../../context/NotificationContext';
 import Modal from '../common/Modal';
 import './Forms.css';

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { crearInscripcion } from '../../api/inscripciones';
+import { crearInscripcion } from '../../services/inscripciones';
 import { useNotificacion } from '../../context/NotificationContext';
 import './Forms.css';
 
