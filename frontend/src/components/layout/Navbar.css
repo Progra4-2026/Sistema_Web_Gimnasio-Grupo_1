@@ -72,6 +72,19 @@ nav[aria-label='Menú principal'] {
   font-size: 0.9rem;
 }
 
+/* El botón secundario es oscuro por defecto; sobre el encabezado oscuro se invierte para que se vea */
+.sesion-navbar .boton-secundario {
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.6);
+  padding: 0.35rem 0.9rem;
+  font-size: 0.85rem;
+}
+
+.sesion-navbar .boton-secundario:hover {
+  background-color: var(--color-primario, #ff5a1f);
+  border-color: var(--color-primario, #ff5a1f);
+}
+
 @media (max-width: 720px) {
   .boton-menu-movil {
     display: inline-block;

@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { listarCursos } from '../api/cursos';
 import { useAuth } from '../context/AuthContext';
+import { useCursos } from '../context/CursosContext';
+import SubmenuServicios from '../components/menus/SubmenuServicios';
 import InscripcionForm from '../components/forms/InscripcionForm';
 import LoginForm from '../components/forms/LoginForm';
 import DesinscripcionForm from '../components/forms/DesinscripcionForm';
@@ -21,20 +22,34 @@ const SUBMENU = [
 ];
 
 export default function ServiciosPage() {
-  const [cursos, setCursos] = useState([]);
-  const [cargandoCursos, setCargandoCursos] = useState(true);
-  const [errorCursos, setErrorCursos] = useState('');
+  // Estado global (CursosContext) + estado local de la página (useState)
+  const { cursos, cargando: cargandoCursos, error: errorCursos, recargarCursos } = useCursos();
   const [cursoSeleccionadoId, setCursoSeleccionadoId] = useState(null);
+  const [seccionActiva, setSeccionActiva] = useState('inscripcion');
 
   const secciones = useRef({});
   const location = useLocation();
   const { usuario } = useAuth();
 
+  function irASeccion(id) {
+    setSeccionActiva(id);
+    secciones.current[id]?.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  // Marca en el submenú la sección que está a la vista mientras el usuario hace scroll
   useEffect(() => {
-    listarCursos()
-      .then(setCursos)
-      .catch((error) => setErrorCursos(error.message))
-      .finally(() => setCargandoCursos(false));
+    const observador = new IntersectionObserver(
+      (entradas) => {
+        for (const entrada of entradas) {
+          if (entrada.isIntersecting) setSeccionActiva(entrada.target.id);
+        }
+      },
+      { rootMargin: '-35% 0px -60% 0px' },
+    );
+    for (const seccion of Object.values(secciones.current)) {
+      if (seccion) observador.observe(seccion);
+    }
+    return () => observador.disconnect();
   }, []);
 
   useEffect(() => {
@@ -43,9 +58,16 @@ export default function ServiciosPage() {
     secciones.current[id]?.scrollIntoView({ behavior: 'smooth' });
   }, [location.hash]);
 
+  // Evento que sube desde CursoCard → CursosList → esta página
   function manejarInscribirme(curso) {
     setCursoSeleccionadoId(curso.id);
-    secciones.current.inscripcion?.scrollIntoView({ behavior: 'smooth' });
+    irASeccion('inscripcion');
+  }
+
+  // Eventos que suben desde los formularios: se recargan los cupos de los cursos
+  function manejarInscripcionExitosa() {
+    setCursoSeleccionadoId(null);
+    recargarCursos();
   }
 
   return (
@@ -55,23 +77,7 @@ export default function ServiciosPage() {
         <p>Todo lo que necesitás para tu proceso en el gimnasio, en un solo lugar.</p>
       </div>
 
-      <nav className="submenu-servicios" aria-label="Submenú de servicios">
-        <ul className="contenedor">
-          {SUBMENU.map((item) => (
-            <li key={item.id}>
-              <a
-                href={`#${item.id}`}
-                onClick={(evento) => {
-                  evento.preventDefault();
-                  secciones.current[item.id]?.scrollIntoView({ behavior: 'smooth' });
-                }}
-              >
-                {item.etiqueta}
-              </a>
-            </li>
-          ))}
-        </ul>
-      </nav>
+      <SubmenuServicios opciones={SUBMENU} activa={seccionActiva} onSeleccionar={irASeccion} />
 
       <main className="contenedor">
         <section id="inscripcion" ref={(el) => (secciones.current.inscripcion = el)} className="seccion seccion-servicio">
@@ -80,7 +86,7 @@ export default function ServiciosPage() {
           <InscripcionForm
             cursos={cursos}
             cursoSeleccionadoId={cursoSeleccionadoId}
-            onInscripcionExitosa={() => setCursoSeleccionadoId(null)}
+            onInscripcionExitosa={manejarInscripcionExitosa}
           />
         </section>
 
@@ -121,7 +127,7 @@ export default function ServiciosPage() {
         <section id="desinscribirse" ref={(el) => (secciones.current.desinscribirse = el)} className="seccion seccion-servicio">
           <h2>Desinscribirse</h2>
           <p>Podés retirar tu inscripción del gimnasio siempre y cuando te encontrés al día con tus pagos.</p>
-          <DesinscripcionForm />
+          <DesinscripcionForm onDesinscripcionExitosa={recargarCursos} />
         </section>
       </main>
     </>

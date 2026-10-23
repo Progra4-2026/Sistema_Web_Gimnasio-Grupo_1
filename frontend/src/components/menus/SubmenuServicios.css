@@ -1,0 +1,32 @@
+.submenu-servicios {
+  background: var(--color-fondo, #f7f7fa);
+  border-bottom: 1px solid var(--color-borde, #e0e0e6);
+  position: sticky;
+  top: 64px;
+  z-index: 10;
+}
+
+.submenu-servicios ul {
+  display: flex;
+  gap: 1.25rem;
+  list-style: none;
+  padding: 0.75rem 1.25rem;
+  margin: 0 auto;
+  overflow-x: auto;
+}
+
+.submenu-servicios a {
+  color: var(--color-secundario, #1a1a2e);
+  font-weight: 600;
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+.submenu-servicios a:hover {
+  color: var(--color-primario, #ff5a1f);
+}
+
+.submenu-servicios a.activo {
+  color: var(--color-primario, #ff5a1f);
+  border-bottom: 2px solid var(--color-primario, #ff5a1f);
+}

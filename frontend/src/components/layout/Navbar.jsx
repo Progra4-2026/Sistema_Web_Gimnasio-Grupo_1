@@ -21,9 +21,14 @@ export default function Navbar() {
   }
 
   async function manejarCerrarSesion() {
-    await cerrarSesion();
-    notificar('info', 'Sesión cerrada.');
-    setMenuAbierto(false);
+    try {
+      await cerrarSesion();
+      notificar('info', 'Sesión cerrada.');
+    } catch (error) {
+      notificar('error', error.message);
+    } finally {
+      setMenuAbierto(false);
+    }
   }
 
   return (

@@ -4,7 +4,7 @@ import { useNotificacion } from '../../context/NotificationContext';
 import Modal from '../common/Modal';
 import './Forms.css';
 
-export default function DesinscripcionForm() {
+export default function DesinscripcionForm({ onDesinscripcionExitosa }) {
   const [cedula, setCedula] = useState('');
   const [error, setError] = useState('');
   const [confirmacionAbierta, setConfirmacionAbierta] = useState(false);
@@ -27,6 +27,7 @@ export default function DesinscripcionForm() {
       await eliminarInscripcion(cedula);
       notificar('exito', 'Tu inscripción fue eliminada correctamente.');
       setCedula('');
+      onDesinscripcionExitosa?.(); // avisa al componente padre (ServiciosPage) para recargar los cupos
     } catch (err) {
       notificar('error', err.message);
     } finally {

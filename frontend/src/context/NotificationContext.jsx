@@ -3,12 +3,13 @@ import { createContext, useContext, useReducer } from 'react';
 
 const NotificationContext = createContext(null);
 
-const estadoInicial = { visible: false, tipo: 'info', texto: '' };
+const estadoInicial = { visible: false, tipo: 'info', texto: '', id: 0 };
 
 function reducer(estado, accion) {
   switch (accion.type) {
     case 'MOSTRAR':
-      return { visible: true, tipo: accion.payload.tipo, texto: accion.payload.texto };
+      // id distinto en cada aviso: el Toast reinicia su temporizador aunque el texto se repita
+      return { visible: true, tipo: accion.payload.tipo, texto: accion.payload.texto, id: estado.id + 1 };
     case 'OCULTAR':
       return { ...estado, visible: false };
     default:
