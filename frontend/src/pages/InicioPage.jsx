@@ -20,8 +20,8 @@ export default function InicioPage() {
             personalizadas, cursos grupales e instructores certificados.
           </p>
           <div className="hero-inicio__botones">
-            <Link to="/servicios#inscripcion" className="boton">Inscribirme ahora</Link>
-            <Link to="/servicios#cursos" className="boton boton-secundario">Ver cursos</Link>
+            <Link to="/servicios/inscripcion" className="boton">Inscribirme ahora</Link>
+            <Link to="/servicios/cursos" className="boton boton-secundario">Ver cursos</Link>
           </div>
         </div>
       </section>
@@ -58,7 +58,7 @@ export default function InicioPage() {
           <article className="tarjeta franja-info__item">
             <h3>¿Listo para empezar?</h3>
             <p>Inscribite en minutos y elegí la rutina o el curso que mejor se adapte a vos.</p>
-            <Link to="/servicios#inscripcion" className="boton">Inscribirme</Link>
+            <Link to="/servicios/inscripcion" className="boton">Inscribirme</Link>
           </article>
         </div>
       </section>
