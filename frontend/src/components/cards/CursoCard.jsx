@@ -1,7 +1,8 @@
 import './Cards.css';
 
 export default function CursoCard({ curso, onInscribirme }) {
-  const sinCupos = Number(curso.cupos) <= 0;
+  // curso es un modelo Curso (models/Curso.js): urlImagen arma la ruta /assets/<archivo>
+  const sinCupos = !curso.tieneCupos();
 
   return (
     <article className="tarjeta tarjeta-curso">

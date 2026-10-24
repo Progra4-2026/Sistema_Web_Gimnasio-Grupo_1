@@ -16,6 +16,18 @@ export default class Curso {
     return new Curso(json);
   }
 
+  /** Datos que se envían al backend en POST/PUT. */
+  aJson() {
+    return {
+      id: this.id ?? null,
+      descripcion: this.descripcion,
+      detalle: this.detalle,
+      horario: this.horario,
+      cupos: this.cupos,
+      imagen: this.imagen || null,
+    };
+  }
+
   tieneCupos() {
     return this.cupos > 0;
   }
