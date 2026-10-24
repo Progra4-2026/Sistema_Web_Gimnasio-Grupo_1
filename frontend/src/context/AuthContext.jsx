@@ -1,6 +1,6 @@
 /* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useEffect, useReducer } from 'react';
-import { cerrarSesion as cerrarSesionApi, iniciarSesion as iniciarSesionApi, obtenerSesion } from '../api/auth';
+import { cerrarSesion as cerrarSesionApi, iniciarSesion as iniciarSesionApi, obtenerSesion } from '../services/auth';
 
 const AuthContext = createContext(null);
 

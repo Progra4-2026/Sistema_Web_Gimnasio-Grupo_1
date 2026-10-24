@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { crearConsulta } from '../../api/consultas';
+import { crearConsulta } from '../../services/consultas';
 import { useNotificacion } from '../../context/NotificationContext';
 import './Forms.css';
 

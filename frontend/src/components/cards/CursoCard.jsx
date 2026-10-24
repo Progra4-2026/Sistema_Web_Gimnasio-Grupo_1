@@ -5,7 +5,7 @@ export default function CursoCard({ curso, onInscribirme }) {
 
   return (
     <article className="tarjeta tarjeta-curso">
-      {curso.imagen && <img src={curso.imagen} alt={curso.descripcion} />}
+      {curso.urlImagen && <img src={curso.urlImagen} alt={curso.descripcion} />}
       <div className="tarjeta-curso__cuerpo">
         <p className="etiqueta-id">Curso #{curso.id}</p>
         <h3>{curso.descripcion}</h3>
