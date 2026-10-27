@@ -3,6 +3,7 @@ package com.grupo1.gimnasio.gimnasio_backend.services;
 import com.grupo1.gimnasio.gimnasio_backend.dto.LoginDTO;
 import com.grupo1.gimnasio.gimnasio_backend.dto.UsuarioSesionDTO;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 /**
@@ -15,8 +16,11 @@ public interface AutenticacionService {
 
     String ATRIBUTO_USUARIO = "usuario";
 
-    /** Valida las credenciales y crea la sesión. 401 si son incorrectas. */
-    UsuarioSesionDTO iniciarSesion(LoginDTO credenciales, HttpServletRequest peticion);
+    /**
+     * Valida las credenciales (probando cliente, instructor y administrador, en ese orden)
+     * y crea la sesión, incluido el SecurityContext de Spring Security. 401 si son incorrectas.
+     */
+    UsuarioSesionDTO iniciarSesion(LoginDTO credenciales, HttpServletRequest peticion, HttpServletResponse respuesta);
 
     /** Invalida la sesión actual, si existe. */
     void cerrarSesion(HttpServletRequest peticion);

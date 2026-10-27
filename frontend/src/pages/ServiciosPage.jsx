@@ -121,7 +121,14 @@ export default function ServiciosPage() {
         <section id="desinscribirse" ref={(el) => (secciones.current.desinscribirse = el)} className="seccion seccion-servicio">
           <h2>Desinscribirse</h2>
           <p>Podés retirar tu inscripción del gimnasio siempre y cuando te encontrés al día con tus pagos.</p>
-          <DesinscripcionForm />
+          {usuario ? (
+            <DesinscripcionForm />
+          ) : (
+            <div className="tarjeta aviso-acceso">
+              <p><strong>Acceso restringido.</strong> Iniciá sesión con tu cédula y contraseña de cliente para desinscribirte.</p>
+              <LoginForm />
+            </div>
+          )}
         </section>
       </main>
     </>

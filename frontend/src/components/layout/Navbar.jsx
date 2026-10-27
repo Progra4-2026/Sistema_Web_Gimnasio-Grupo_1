@@ -51,14 +51,30 @@ export default function Navbar() {
                 </NavLink>
               </li>
             ))}
+            {usuario?.rol === 'instructor' && (
+              <li>
+                <NavLink to="/instructor" onClick={manejarClicEnlace}>Panel Instructor</NavLink>
+              </li>
+            )}
+            {usuario?.rol === 'administrador' && (
+              <li>
+                <NavLink to="/admin" onClick={manejarClicEnlace}>Panel Administrador</NavLink>
+              </li>
+            )}
           </ul>
 
-          {usuario && (
+          {usuario ? (
             <div className="sesion-navbar">
               <span>Hola, {usuario.nombre}</span>
               <button type="button" className="boton boton-secundario" onClick={manejarCerrarSesion}>
                 Cerrar sesión
               </button>
+            </div>
+          ) : (
+            <div className="sesion-navbar">
+              <NavLink to="/login" className="boton boton-secundario" onClick={manejarClicEnlace}>
+                Iniciar sesión
+              </NavLink>
             </div>
           )}
         </nav>

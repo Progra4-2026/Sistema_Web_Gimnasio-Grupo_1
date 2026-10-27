@@ -7,6 +7,7 @@ import com.grupo1.gimnasio.gimnasio_backend.services.AutenticacionService;
 import com.grupo1.gimnasio.gimnasio_backend.services.InscripcionService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -43,18 +44,21 @@ public class InscripcionController extends ControladorBase {
         this.autenticacionService = autenticacionService;
     }
 
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     @GetMapping
     public List<InscripcionRespuestaDTO> listar() {
         return inscripcionService.listar();
     }
 
     /** Ejemplo de uso de la HttpSession: el cliente solo ve su propia inscripción. */
+    @PreAuthorize("hasRole('CLIENTE')")
     @GetMapping("/mia")
     public InscripcionRespuestaDTO mia(HttpSession sesion) {
         String cedula = autenticacionService.usuarioActual(sesion).cedula();
         return inscripcionService.obtener(cedula);
     }
 
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     @GetMapping("/{cedula}")
     public InscripcionRespuestaDTO obtener(@PathVariable String cedula) {
         return inscripcionService.obtener(cedula);
@@ -71,6 +75,9 @@ public class InscripcionController extends ControladorBase {
         return ResponseEntity.created(URI.create("/api/inscripciones/" + creada.cedula())).body(cuerpo);
     }
 
+    // El cliente puede editar/borrar su propia inscripción (cedula == su sesión);
+    // cualquier otra cédula requiere rol administrador.
+    @PreAuthorize("hasRole('ADMINISTRADOR') or (hasRole('CLIENTE') and #cedula == authentication.name)")
     @PutMapping("/{cedula}")
     public ResultadoOperacionDTO<InscripcionRespuestaDTO> actualizar(@PathVariable String cedula,
                                                                      @RequestBody InscripcionDTO cambios) {
@@ -78,6 +85,7 @@ public class InscripcionController extends ControladorBase {
         return new ResultadoOperacionDTO<>("Inscripción actualizada correctamente.", 1, actualizada);
     }
 
+    @PreAuthorize("hasRole('ADMINISTRADOR') or (hasRole('CLIENTE') and #cedula == authentication.name)")
     @DeleteMapping("/{cedula}")
     public ResponseEntity<Void> eliminar(@PathVariable String cedula) {
         inscripcionService.eliminar(cedula);

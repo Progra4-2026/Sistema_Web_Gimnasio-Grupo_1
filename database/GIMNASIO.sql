@@ -332,3 +332,41 @@ SELECT c.*
 FROM historial_curso hc
 RIGHT JOIN cursos c ON c.id_curso = hc.curso
 WHERE hc.curso IS NULL;
+
+-- ============================================================
+-- Entrega final: login de 3 roles (cliente, instructor, administrador)
+-- con contraseñas cifradas (hash + salt, BCrypt) y autorización por rol.
+-- ============================================================
+
+-- Contraseñas cifradas (BCrypt). NUNCA se guardan en texto plano.
+-- Quedan en blanco aquí: un ApplicationRunner las rellena al arrancar el backend
+-- (contraseña por defecto = la propia cédula / código, ya hasheada) para que el
+-- login funcione sin tener que calcular hashes BCrypt a mano en este script.
+ALTER TABLE cliente ADD COLUMN contrasena VARCHAR(100) NOT NULL DEFAULT '';
+ALTER TABLE instructores ADD COLUMN contrasena VARCHAR(100) NOT NULL DEFAULT '';
+
+-- Preserva la validación de edad del alta de clientes (Entregable 3) una vez
+-- que el registro pasa a guardarse en esta tabla en vez de en memoria.
+ALTER TABLE cliente ADD COLUMN fecha_nacimiento DATE NULL;
+
+-- Tercer rol: tabla independiente, igual de simple que instructores.
+-- No hay columna "rol" en ninguna tabla: el rol lo determina cuál tabla matchea el login.
+CREATE TABLE administradores (
+    cod_administrador INT NOT NULL,
+    nombre VARCHAR(30) NOT NULL,
+    e_mail VARCHAR(30),
+    contrasena VARCHAR(100) NOT NULL,
+    CONSTRAINT pkadministradores PRIMARY KEY (cod_administrador)
+);
+
+-- Parámetros del sistema que el administrador puede gestionar (clave/valor genérico).
+CREATE TABLE parametros_sistema (
+    clave VARCHAR(50) NOT NULL,
+    valor VARCHAR(255) NOT NULL,
+    descripcion VARCHAR(255),
+    CONSTRAINT pkparametros_sistema PRIMARY KEY (clave)
+);
+
+INSERT INTO parametros_sistema (clave, valor, descripcion) VALUES
+    ('nombre_gimnasio', 'PowerFit', 'Nombre comercial del gimnasio'),
+    ('capacidad_maxima', '100', 'Capacidad máxima simultánea del gimnasio');

@@ -2,15 +2,16 @@ package com.grupo1.gimnasio.gimnasio_backend.services.impl;
 
 import com.grupo1.gimnasio.gimnasio_backend.dto.InscripcionDTO;
 import com.grupo1.gimnasio.gimnasio_backend.dto.InscripcionRespuestaDTO;
-import com.grupo1.gimnasio.gimnasio_backend.dto.UsuarioSesionDTO;
+import com.grupo1.gimnasio.gimnasio_backend.entities.Cliente;
 import com.grupo1.gimnasio.gimnasio_backend.exceptions.ConflictoException;
 import com.grupo1.gimnasio.gimnasio_backend.exceptions.DatosInvalidosException;
-import com.grupo1.gimnasio.gimnasio_backend.exceptions.NoAutenticadoException;
 import com.grupo1.gimnasio.gimnasio_backend.exceptions.RecursoNoEncontradoException;
+import com.grupo1.gimnasio.gimnasio_backend.repositories.ClienteRepository;
 import com.grupo1.gimnasio.gimnasio_backend.services.CursoService;
 import com.grupo1.gimnasio.gimnasio_backend.services.InscripcionService;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -28,16 +29,22 @@ import static com.grupo1.gimnasio.gimnasio_backend.services.impl.ReglasValidacio
 
 /**
  * Reglas de negocio de las inscripciones:
- *  - validación de nombre, cédula, correo, teléfono, fecha de nacimiento y contraseña;
+ *  - validación de nombre, apellidos, cédula, correo, teléfono, fecha de nacimiento y contraseña;
  *  - cálculo de la edad a partir de la fecha de nacimiento (mínimo 14 años, igual que el frontend);
  *  - una sola inscripción por cédula (409 si se repite);
  *  - curso: debe existir y tener cupos (se reserva uno); rutina: objetivo válido;
  *  - al actualizar no se cambia la cédula (PK) ni el curso (FK);
  *  - al desinscribir se libera el cupo del curso;
- *  - la contraseña se guarda cifrada con hash + salt, nunca en texto plano.
+ *  - la contraseña se guarda cifrada con BCrypt (hash + salt), nunca en texto plano.
+ *
+ * tipoInscripcion/idCurso/objetivo no tienen columna propia en la tabla "cliente" (nunca
+ * la tuvieron): se devuelven en la respuesta de crear(), pero listar()/obtener() no pueden
+ * "recordarlos" después porque no hay dónde guardarlos sin inventar una segunda fuente de
+ * verdad — es una consecuencia documentada, no un bug. El único dato de ese trío que sí se
+ * recuerda internamente es el curso elegido (para poder liberar el cupo al desinscribirse).
  *
  * Patrón Singleton: bean de alcance singleton.
- * Datos en memoria hasta que exista ClienteRepository (JpaRepository).
+ * Persistencia real en MySQL vía ClienteRepository (JpaRepository).
  */
 @Service
 @Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
@@ -48,24 +55,30 @@ public class InscripcionServiceImpl implements InscripcionService {
     private static final Set<String> OBJETIVOS = Set.of("fuerza", "resistencia", "peso", "flexibilidad");
 
     private final CursoService cursoService;
-    private final Map<String, Inscripcion> inscripciones = new ConcurrentHashMap<>();
+    private final ClienteRepository clienteRepository;
+    private final PasswordEncoder passwordEncoder;
+    /** Cédula -> curso elegido al inscribirse, solo para poder liberar el cupo al desinscribirse. */
+    private final Map<Integer, Integer> cursoPorCliente = new ConcurrentHashMap<>();
 
-    /** Inyección por constructor: Spring entrega el único bean de CursoService. */
-    public InscripcionServiceImpl(CursoService cursoService) {
+    public InscripcionServiceImpl(CursoService cursoService, ClienteRepository clienteRepository,
+                                   PasswordEncoder passwordEncoder) {
         this.cursoService = cursoService;
+        this.clienteRepository = clienteRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
     public List<InscripcionRespuestaDTO> listar() {
         List<InscripcionRespuestaDTO> lista = new ArrayList<>();
-        for (Inscripcion ins : inscripciones.values()) lista.add(aRespuesta(ins));
+        for (Cliente c : clienteRepository.findAll()) lista.add(aRespuesta(c, null));
         lista.sort((a, b) -> a.nombre().compareToIgnoreCase(b.nombre()));
         return lista;
     }
 
     @Override
     public InscripcionRespuestaDTO obtener(String cedula) {
-        return aRespuesta(buscar(cedula));
+        Cliente c = buscar(cedula);
+        return aRespuesta(c, null);
     }
 
     @Override
@@ -81,79 +94,73 @@ public class InscripcionServiceImpl implements InscripcionService {
         Integer idCurso = validarTipo(datos, errores);
         if (!errores.isEmpty()) throw new DatosInvalidosException(errores);
 
-        String cedula = datos.cedula().trim();
-        if (inscripciones.containsKey(cedula)) {
+        Integer cedula = Integer.valueOf(datos.cedula().trim());
+        if (clienteRepository.existsById(cedula)) {
             throw new ConflictoException("Ya existe una inscripción con la cédula " + cedula + ".");
         }
         if (idCurso != null) cursoService.reservarCupo(idCurso); // 404 o 409 si no se puede
 
-        Inscripcion nueva = new Inscripcion();
-        nueva.cedula = cedula;
-        nueva.tipo = datos.tipoInscripcion();
-        nueva.idCurso = idCurso;
-        nueva.objetivo = "rutina".equals(nueva.tipo) ? datos.objetivo() : null;
-        nueva.hashContrasena = HashContrasenas.cifrar(datos.password());
-        nueva.fechaInscripcion = LocalDate.now();
-        copiarDatosPersonales(datos, nueva);
-        inscripciones.put(cedula, nueva);
-        return aRespuesta(nueva);
+        Cliente nuevo = new Cliente();
+        nuevo.setCedula(cedula);
+        nuevo.setTelHabitacion(0);
+        nuevo.setFechaInscripcion(LocalDate.now());
+        nuevo.setContrasena(passwordEncoder.encode(datos.password()));
+        copiarDatosPersonales(datos, nuevo);
+        clienteRepository.save(nuevo);
+
+        if (idCurso != null) cursoPorCliente.put(cedula, idCurso);
+        return aRespuesta(nuevo, datos);
     }
 
     @Override
     public synchronized InscripcionRespuestaDTO actualizar(String cedula, InscripcionDTO cambios) {
-        Inscripcion actual = buscar(cedula);
+        Cliente actual = buscar(cedula);
 
-        if (cambios.cedula() != null && !cambios.cedula().trim().equals(actual.cedula)) {
+        if (cambios.cedula() != null && !cambios.cedula().trim().equals(String.valueOf(actual.getCedula()))) {
             throw new DatosInvalidosException("No se permite modificar la cédula (llave primaria).");
         }
-        if (cambios.idCurso() != null && !Objects.equals(aEntero(cambios.idCurso()), actual.idCurso)) {
+        Integer idCursoActual = cursoPorCliente.get(actual.getCedula());
+        if (cambios.idCurso() != null && !Objects.equals(aEntero(cambios.idCurso()), idCursoActual)) {
             throw new DatosInvalidosException(
                     "No se permite cambiar el curso (llave foránea). Desinscribite y volvé a inscribirte.");
-        }
-        if (cambios.tipoInscripcion() != null && !cambios.tipoInscripcion().equals(actual.tipo)) {
-            throw new DatosInvalidosException("No se permite cambiar el tipo de inscripción.");
         }
 
         Map<String, String> errores = new LinkedHashMap<>();
         validarDatosPersonales(cambios, errores);
-        if ("rutina".equals(actual.tipo) && cambios.objetivo() != null && !OBJETIVOS.contains(cambios.objetivo())) {
+        if (cambios.objetivo() != null && !OBJETIVOS.contains(cambios.objetivo())) {
             errores.put("objetivo", "Seleccioná un objetivo válido.");
         }
         if (!errores.isEmpty()) throw new DatosInvalidosException(errores);
 
         copiarDatosPersonales(cambios, actual);
-        if ("rutina".equals(actual.tipo) && cambios.objetivo() != null) actual.objetivo = cambios.objetivo();
-        return aRespuesta(actual);
+        clienteRepository.save(actual);
+        return aRespuesta(actual, cambios);
     }
 
     @Override
     public synchronized void eliminar(String cedula) {
-        Inscripcion ins = buscar(cedula);
-        inscripciones.remove(ins.cedula);
-        if (ins.idCurso != null) cursoService.liberarCupo(ins.idCurso);
-    }
-
-    @Override
-    public UsuarioSesionDTO autenticar(String cedula, String password) {
-        Inscripcion ins = vacio(cedula) ? null : inscripciones.get(cedula.trim());
-        // Mismo mensaje si la cédula no existe o la contraseña es incorrecta: no revela cuál falló
-        if (ins == null || vacio(password) || !HashContrasenas.coincide(password, ins.hashContrasena)) {
-            throw new NoAutenticadoException("Cédula o contraseña incorrectas.");
-        }
-        return new UsuarioSesionDTO(ins.cedula, ins.nombre, "cliente");
+        Cliente c = buscar(cedula);
+        clienteRepository.delete(c);
+        Integer idCurso = cursoPorCliente.remove(c.getCedula());
+        if (idCurso != null) cursoService.liberarCupo(idCurso);
     }
 
     /* ---------- auxiliares ---------- */
 
-    private Inscripcion buscar(String cedula) {
-        Inscripcion ins = cedula == null ? null : inscripciones.get(cedula.trim());
-        if (ins == null) throw new RecursoNoEncontradoException("una inscripción", cedula);
-        return ins;
+    private Cliente buscar(String cedula) {
+        Integer id = vacio(cedula) ? null : aEntero(cedula.trim());
+        Cliente c = id == null ? null : clienteRepository.findById(id).orElse(null);
+        if (c == null) throw new RecursoNoEncontradoException("una inscripción", cedula);
+        return c;
     }
 
     private static void validarDatosPersonales(InscripcionDTO d, Map<String, String> errores) {
         requerido(errores, "nombre", d.nombre());
-        longitud(errores, "nombre", d.nombre(), 3, 80);
+        longitud(errores, "nombre", d.nombre(), 3, 30);
+        requerido(errores, "apellido1", d.apellido1());
+        longitud(errores, "apellido1", d.apellido1(), 2, 30);
+        requerido(errores, "apellido2", d.apellido2());
+        longitud(errores, "apellido2", d.apellido2(), 2, 30);
         requerido(errores, "email", d.email());
         patron(errores, "email", d.email(), EMAIL, "Correo electrónico inválido.");
         requerido(errores, "telefono", d.telefono());
@@ -190,11 +197,13 @@ public class InscripcionServiceImpl implements InscripcionService {
         return null;
     }
 
-    private static void copiarDatosPersonales(InscripcionDTO d, Inscripcion destino) {
-        destino.nombre = limpiar(d.nombre());
-        destino.email = limpiar(d.email());
-        destino.telefono = limpiar(d.telefono());
-        destino.fechaNacimiento = LocalDate.parse(d.fechaNacimiento().trim());
+    private static void copiarDatosPersonales(InscripcionDTO d, Cliente destino) {
+        destino.setNombre(limpiar(d.nombre()));
+        destino.setApellido1(limpiar(d.apellido1()));
+        destino.setApellido2(limpiar(d.apellido2()));
+        destino.setEmail(limpiar(d.email()));
+        destino.setCelular(Integer.valueOf(limpiar(d.telefono()).replace("-", "")));
+        destino.setFechaNacimiento(LocalDate.parse(d.fechaNacimiento().trim()));
     }
 
     static int calcularEdad(LocalDate nacimiento) {
@@ -210,23 +219,15 @@ public class InscripcionServiceImpl implements InscripcionService {
         }
     }
 
-    private static InscripcionRespuestaDTO aRespuesta(Inscripcion i) {
-        return new InscripcionRespuestaDTO(i.cedula, i.nombre, i.email, i.telefono,
-                i.fechaNacimiento.toString(), calcularEdad(i.fechaNacimiento), i.tipo,
-                i.idCurso, i.objetivo, i.fechaInscripcion.toString());
-    }
-
-    /** Registro interno. Se reemplaza por la entidad Cliente cuando exista. */
-    private static final class Inscripcion {
-        String cedula;
-        String nombre;
-        String email;
-        String telefono;
-        LocalDate fechaNacimiento;
-        String tipo;
-        Integer idCurso;
-        String objetivo;
-        String hashContrasena;
-        LocalDate fechaInscripcion;
+    /** datosEnvio no nulo solo justo después de crear/actualizar, para echar tipoInscripcion/idCurso/objetivo. */
+    private InscripcionRespuestaDTO aRespuesta(Cliente c, InscripcionDTO datosEnvio) {
+        Integer edad = c.getFechaNacimiento() == null ? null : calcularEdad(c.getFechaNacimiento());
+        String tipo = datosEnvio != null ? datosEnvio.tipoInscripcion() : null;
+        Integer idCurso = datosEnvio != null ? aEntero(datosEnvio.idCurso()) : cursoPorCliente.get(c.getCedula());
+        String objetivo = datosEnvio != null ? datosEnvio.objetivo() : null;
+        return new InscripcionRespuestaDTO(String.valueOf(c.getCedula()), c.getNombre(), c.getApellido1(),
+                c.getApellido2(), c.getEmail(), String.valueOf(c.getCelular()),
+                c.getFechaNacimiento() == null ? null : c.getFechaNacimiento().toString(), edad,
+                tipo, idCurso, objetivo, c.getFechaInscripcion().toString());
     }
 }

@@ -57,3 +57,30 @@
   color: var(--color-error, #c62828);
   font-weight: 600;
 }
+
+.etiqueta-estado {
+  display: inline-block;
+  margin-top: 0.5rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: capitalize;
+  background: #eee;
+  color: #555;
+}
+
+.etiqueta-estado--excelente {
+  background: #e3f6e9;
+  color: #1e7a3d;
+}
+
+.etiqueta-estado--bueno {
+  background: #eaf2fe;
+  color: #1a5fb4;
+}
+
+.etiqueta-estado--regular {
+  background: #fff3e0;
+  color: #b4651a;
+}

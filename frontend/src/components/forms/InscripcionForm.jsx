@@ -5,6 +5,8 @@ import './Forms.css';
 
 const VALOR_INICIAL = {
   nombre: '',
+  apellido1: '',
+  apellido2: '',
   cedula: '',
   email: '',
   telefono: '',
@@ -15,7 +17,8 @@ const VALOR_INICIAL = {
   password: '',
 };
 
-const PATRON_NOMBRE = /^[A-Za-zÁÉÍÓÚáéíóúÑñÜü ]{3,80}$/;
+const PATRON_NOMBRE = /^[A-Za-zÁÉÍÓÚáéíóúÑñÜü ]{3,30}$/;
+const PATRON_APELLIDO = /^[A-Za-zÁÉÍÓÚáéíóúÑñÜü ]{2,30}$/;
 const PATRON_CEDULA = /^[0-9]{9,12}$/;
 const PATRON_TELEFONO = /^[0-9]{4}-?[0-9]{4}$/;
 
@@ -32,7 +35,9 @@ function calcularEdad(fechaNacimiento) {
 function validar(datos) {
   const errores = {};
 
-  if (!PATRON_NOMBRE.test(datos.nombre)) errores.nombre = 'Ingresá solo letras y espacios (3 a 80 caracteres).';
+  if (!PATRON_NOMBRE.test(datos.nombre)) errores.nombre = 'Ingresá solo letras y espacios (3 a 30 caracteres).';
+  if (!PATRON_APELLIDO.test(datos.apellido1)) errores.apellido1 = 'Ingresá solo letras y espacios (2 a 30 caracteres).';
+  if (!PATRON_APELLIDO.test(datos.apellido2)) errores.apellido2 = 'Ingresá solo letras y espacios (2 a 30 caracteres).';
   if (!PATRON_CEDULA.test(datos.cedula)) errores.cedula = 'Solo números, entre 9 y 12 dígitos.';
   if (!/^\S+@\S+\.\S+$/.test(datos.email)) errores.email = 'Ingresá un correo válido.';
   if (!PATRON_TELEFONO.test(datos.telefono)) errores.telefono = 'Formato: 8888-8888.';
@@ -91,9 +96,21 @@ export default function InscripcionForm({ cursos, cursoSeleccionadoId, onInscrip
   return (
     <form className="formulario" onSubmit={manejarEnvio}>
       <div className="campo-formulario">
-        <label htmlFor="ins-nombre">Nombre completo <span className="obligatorio">*</span></label>
-        <input id="ins-nombre" name="nombre" value={datos.nombre} onChange={manejarCambio} placeholder="Ej: Juan Pérez Alvarado" />
+        <label htmlFor="ins-nombre">Nombre <span className="obligatorio">*</span></label>
+        <input id="ins-nombre" name="nombre" value={datos.nombre} onChange={manejarCambio} placeholder="Ej: Juan" />
         {errores.nombre && <p className="texto-error">{errores.nombre}</p>}
+      </div>
+
+      <div className="campo-formulario">
+        <label htmlFor="ins-apellido1">Primer apellido <span className="obligatorio">*</span></label>
+        <input id="ins-apellido1" name="apellido1" value={datos.apellido1} onChange={manejarCambio} placeholder="Ej: Pérez" />
+        {errores.apellido1 && <p className="texto-error">{errores.apellido1}</p>}
+      </div>
+
+      <div className="campo-formulario">
+        <label htmlFor="ins-apellido2">Segundo apellido <span className="obligatorio">*</span></label>
+        <input id="ins-apellido2" name="apellido2" value={datos.apellido2} onChange={manejarCambio} placeholder="Ej: Alvarado" />
+        {errores.apellido2 && <p className="texto-error">{errores.apellido2}</p>}
       </div>
 
       <div className="campo-formulario">

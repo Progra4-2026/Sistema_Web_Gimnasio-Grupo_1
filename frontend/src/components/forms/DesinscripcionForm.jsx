@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { eliminarInscripcion } from '../../api/inscripciones';
+import { useAuth } from '../../context/AuthContext';
 import { useNotificacion } from '../../context/NotificationContext';
 import Modal from '../common/Modal';
 import './Forms.css';
 
 export default function DesinscripcionForm() {
-  const [cedula, setCedula] = useState('');
+  const { usuario } = useAuth();
+  const [cedula, setCedula] = useState(usuario?.rol === 'cliente' ? usuario.cedula : '');
   const [error, setError] = useState('');
   const [confirmacionAbierta, setConfirmacionAbierta] = useState(false);
   const [enviando, setEnviando] = useState(false);
@@ -40,7 +42,8 @@ export default function DesinscripcionForm() {
       <form className="formulario" onSubmit={manejarEnvio}>
         <div className="campo-formulario">
           <label htmlFor="desin-cedula">Cédula / Identificación <span className="obligatorio">*</span></label>
-          <input id="desin-cedula" value={cedula} onChange={(evento) => setCedula(evento.target.value)} placeholder="Ej: 304560789" />
+          <input id="desin-cedula" value={cedula} onChange={(evento) => setCedula(evento.target.value)}
+                 placeholder="Ej: 304560789" readOnly={usuario?.rol === 'cliente'} />
           {error && <p className="texto-error">{error}</p>}
         </div>
         <p className="texto-ayuda">Nota: la solicitud solo se procesará si no existen pagos pendientes asociados a tu cuenta.</p>

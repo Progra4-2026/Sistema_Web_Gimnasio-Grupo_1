@@ -57,7 +57,8 @@ Verificá que las tablas se crearon correctamente:
 mysql -u root -p gimnasio_db -e "SHOW TABLES;"
 ```
 
-Deberías ver: `cliente`, `cursos`, `Curso_cliente`, `historial_curso`, `instructores`, `maquinas`, `rutinas`, `Rutina_cliente`.
+Deberías ver: `administradores`, `cliente`, `cursos`, `Curso_cliente`, `historial_curso`, `instructores`,
+`maquinas`, `parametros_sistema`, `rutinas`, `Rutina_cliente`.
 
 ## 3. Levantar el backend (Spring Boot)
 
@@ -140,14 +141,42 @@ Módulos JavaScript (`frontend/public/js/`):
 
 Estas páginas son independientes del SPA de React — conviven en el mismo repositorio pero no comparten código ni build.
 
+## Login y roles
+
+El sistema tiene 3 roles, cada uno con su propia tabla en MySQL (`cliente`, `instructores`,
+`administradores`) y contraseña cifrada con BCrypt (hash + salt, nunca texto plano). Al
+arrancar el backend por primera vez, `CargaInicialDatosRunner` rellena automáticamente la
+contraseña de cualquier cliente/instructor sembrado que todavía esté en blanco, usando como
+contraseña por defecto su propia cédula/código, y crea un administrador de demo si no existe
+ninguno. Para loguearte en `/login` con los datos de ejemplo de `database/GIMNASIO.sql`:
+
+| Rol | Cédula / código | Contraseña |
+|---|---|---|
+| Cliente | `200` (o cualquier otra cédula sembrada) | `200` (su propia cédula) |
+| Instructor | `100` (o cualquier otro código sembrado) | `100` (su propio código) |
+| Administrador | `1` | `admin123` |
+
+Autorización por rol: el cliente solo ve sus propias rutinas (`/api/rutinas/mias`); el
+instructor gestiona máquinas y rutinas (`/instructor`); el administrador gestiona usuarios y
+parámetros del sistema (`/admin`). Cruzar roles responde `403`, no autenticarse responde `401`.
+
 ## Endpoints disponibles
 
-| Método | Ruta | Descripción |
-|---|---|---|
-| GET | `/api/health` | Verifica que el backend esté activo. Responde `{"status":"ok"}` |
-| GET | `/api/cursos` | Lista de cursos (descripción, horario, cupos, imagen) |
-| POST | `/api/consultas` | Recibe el formulario de Contactos. `201` si es válido, `400` con los errores por campo si no |
-| POST | `/api/inscripciones` | Recibe el formulario de Inscripción. `201` si es válido, `400` si hay datos inválidos, `409` si la cédula ya está inscrita |
+| Método | Ruta | Descripción | Acceso |
+|---|---|---|---|
+| GET | `/api/health` | Verifica que el backend esté activo. Responde `{"status":"ok"}` | Público |
+| POST | `/api/auth/login` | Inicia sesión (cliente, instructor o administrador) | Público |
+| GET | `/api/auth/sesion` | Usuario de la sesión actual | Autenticado |
+| POST | `/api/auth/logout` | Cierra la sesión | Autenticado |
+| GET | `/api/cursos` | Lista de cursos (descripción, horario, cupos, imagen) | Público |
+| POST | `/api/consultas` | Recibe el formulario de Contactos | Público |
+| POST | `/api/inscripciones` | Recibe el formulario de Inscripción (alta de cliente) | Público |
+| GET\|PUT\|DELETE | `/api/inscripciones/{cedula}` / `GET /api/inscripciones` | Administración de clientes | Administrador (o el propio cliente, en su cédula) |
+| GET | `/api/maquinas` | Lista de máquinas | Público |
+| POST\|PUT\|DELETE | `/api/maquinas` | Alta/edición/borrado de máquinas | Instructor |
+| GET\|POST\|PUT\|DELETE | `/api/rutinas` | CRUD de rutinas | Instructor |
+| GET | `/api/rutinas/mias` | Rutinas del cliente en sesión | Cliente |
+| `/api/admin/instructores`, `/api/admin/administradores`, `/api/admin/parametros` | CRUD de instructores, administradores y parámetros del sistema | Administrador |
 
 ## Flujo de trabajo en GitHub
 

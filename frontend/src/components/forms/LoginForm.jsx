@@ -23,7 +23,7 @@ export default function LoginForm({ onExito }) {
       const respuesta = await iniciarSesion(datos);
       notificar('exito', respuesta.mensaje);
       setDatos({ cedula: '', password: '' });
-      onExito?.();
+      onExito?.(respuesta.usuario);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -34,8 +34,8 @@ export default function LoginForm({ onExito }) {
   return (
     <form className="formulario formulario-inline" onSubmit={manejarEnvio}>
       <div className="campo-formulario">
-        <label htmlFor="rut-cedula">Cédula</label>
-        <input id="rut-cedula" name="cedula" value={datos.cedula} onChange={manejarCambio} placeholder="Cédula" required />
+        <label htmlFor="rut-cedula">Cédula / Código</label>
+        <input id="rut-cedula" name="cedula" value={datos.cedula} onChange={manejarCambio} placeholder="Cédula o código" required />
       </div>
       <div className="campo-formulario">
         <label htmlFor="rut-password">Contraseña</label>

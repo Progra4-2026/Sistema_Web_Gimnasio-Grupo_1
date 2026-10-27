@@ -5,6 +5,7 @@ import com.grupo1.gimnasio.gimnasio_backend.exceptions.DatosInvalidosException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
@@ -37,6 +38,13 @@ public abstract class ControladorBase {
             cuerpo.put("errores", invalidos.getErrores());
         }
         return ResponseEntity.status(ex.getEstado()).body(cuerpo);
+    }
+
+    /** @PreAuthorize denegando el acceso dentro de un método de controlador (rol incorrecto). */
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<Map<String, Object>> manejarAccesoDenegado(AccessDeniedException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(Map.of("mensaje", "No tenés permiso para realizar esta acción."));
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)

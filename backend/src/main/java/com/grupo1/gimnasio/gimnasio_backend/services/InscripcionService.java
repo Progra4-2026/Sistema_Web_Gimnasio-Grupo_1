@@ -2,7 +2,6 @@ package com.grupo1.gimnasio.gimnasio_backend.services;
 
 import com.grupo1.gimnasio.gimnasio_backend.dto.InscripcionDTO;
 import com.grupo1.gimnasio.gimnasio_backend.dto.InscripcionRespuestaDTO;
-import com.grupo1.gimnasio.gimnasio_backend.dto.UsuarioSesionDTO;
 
 import java.util.List;
 
@@ -23,7 +22,4 @@ public interface InscripcionService {
 
     /** Desinscribe al cliente y libera su cupo. */
     void eliminar(String cedula);
-
-    /** Verifica cédula y contraseña. 401 si no coinciden. */
-    UsuarioSesionDTO autenticar(String cedula, String password);
 }

@@ -76,3 +76,12 @@
 .bloque-blog {
   margin: 2rem 0;
 }
+
+.seccion-servicio {
+  padding: 2.5rem 0;
+  border-bottom: 1px solid var(--color-borde, #e0e0e6);
+}
+
+.seccion-servicio:last-child {
+  border-bottom: none;
+}

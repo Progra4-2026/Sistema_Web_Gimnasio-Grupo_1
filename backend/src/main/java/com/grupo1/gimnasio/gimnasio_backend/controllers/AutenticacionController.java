@@ -4,6 +4,7 @@ import com.grupo1.gimnasio.gimnasio_backend.dto.LoginDTO;
 import com.grupo1.gimnasio.gimnasio_backend.dto.UsuarioSesionDTO;
 import com.grupo1.gimnasio.gimnasio_backend.services.AutenticacionService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,8 +35,9 @@ public class AutenticacionController extends ControladorBase {
     }
 
     @PostMapping("/login")
-    public Map<String, Object> login(@RequestBody LoginDTO credenciales, HttpServletRequest peticion) {
-        UsuarioSesionDTO usuario = autenticacionService.iniciarSesion(credenciales, peticion);
+    public Map<String, Object> login(@RequestBody LoginDTO credenciales, HttpServletRequest peticion,
+                                      HttpServletResponse respuesta) {
+        UsuarioSesionDTO usuario = autenticacionService.iniciarSesion(credenciales, peticion, respuesta);
         return Map.of("mensaje", "Sesión iniciada. ¡Hola, " + usuario.nombre() + "!", "usuario", usuario);
     }
 
