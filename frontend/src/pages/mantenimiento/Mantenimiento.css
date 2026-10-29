@@ -25,3 +25,8 @@
   padding: 0.35rem 0.8rem;
   font-size: 0.85rem;
 }
+
+
+.filtro-tabla {
+  max-width: 320px;
+}

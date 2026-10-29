@@ -5,7 +5,7 @@ export default function Modal({ abierto, titulo, onCerrar, children }) {
 
   return (
     <div className="modal-fondo" onClick={onCerrar}>
-      <div className="modal-caja" onClick={(evento) => evento.stopPropagation()}>
+      <div className="modal-caja" role="dialog" aria-modal="true" aria-label={titulo} onClick={(evento) => evento.stopPropagation()}>
         <div className="modal-encabezado">
           <h3>{titulo}</h3>
           <button type="button" className="modal-cerrar" aria-label="Cerrar" onClick={onCerrar}>

@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 /**
  * Tabla {@code credenciales} (sección h de GIMNASIO.sql).
  * Relación 1 a 1 con Cliente: comparte la llave (la cédula) mediante @MapsId.
- * Guarda la contraseña ya cifrada con hash + salt (PBKDF2, ver HashContrasenas), nunca en texto plano.
+ * Guarda la contraseña ya cifrada con BCrypt (hash + salt, PasswordEncoder de Spring Security), nunca en texto plano.
  */
 @Entity
 @Table(name = "credenciales")

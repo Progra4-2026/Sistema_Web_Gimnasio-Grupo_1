@@ -5,6 +5,7 @@ import com.grupo1.gimnasio.gimnasio_backend.dto.LoginDTO;
 import com.grupo1.gimnasio.gimnasio_backend.dto.UsuarioSesionDTO;
 import com.grupo1.gimnasio.gimnasio_backend.services.AutenticacionService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,7 +19,7 @@ import java.util.Map;
 /**
  * Sesiones HTTP — /api/auth
  *
- *   POST /api/auth/login    200 usuario + cookie JSESSIONID | 401 credenciales incorrectas
+ *   POST /api/auth/login    200 usuario (cliente, instructor o administrador) + cookie JSESSIONID | 401
  *   GET  /api/auth/sesion   200 usuario en sesión          | 401 sin sesión
  *   POST /api/auth/logout   204 sesión cerrada
  *
@@ -35,8 +36,9 @@ public class AutenticacionController {
     }
 
     @PostMapping("/login")
-    public Map<String, Object> login(@Valid @RequestBody LoginDTO credenciales, HttpServletRequest peticion) {
-        UsuarioSesionDTO usuario = autenticacionService.iniciarSesion(credenciales, peticion);
+    public Map<String, Object> login(@Valid @RequestBody LoginDTO credenciales, HttpServletRequest peticion,
+                                     HttpServletResponse respuesta) {
+        UsuarioSesionDTO usuario = autenticacionService.iniciarSesion(credenciales, peticion, respuesta);
         return Map.of("mensaje", "Sesión iniciada. ¡Hola, " + usuario.nombre() + "!", "usuario", usuario);
     }
 

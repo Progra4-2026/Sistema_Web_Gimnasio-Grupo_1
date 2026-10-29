@@ -5,6 +5,7 @@ import com.grupo1.gimnasio.gimnasio_backend.dto.ConsultaDTO;
 import com.grupo1.gimnasio.gimnasio_backend.services.ConsultaService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,8 +18,8 @@ import java.util.Map;
 /**
  * Consultas del formulario de Contactos — /api/consultas
  *
- *   GET  /api/consultas   200 lista
- *   POST /api/consultas   201 | 400 con errores por campo
+ *   GET  /api/consultas   200 lista                      — ADMINISTRADOR
+ *   POST /api/consultas   201 | 400 con errores por campo — público
  */
 @RestController
 @RequestMapping("/api/consultas")
@@ -30,6 +31,7 @@ public class ConsultaController {
         this.consultaService = consultaService;
     }
 
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     @GetMapping
     public List<Map<String, Object>> listar() {
         return consultaService.listar();

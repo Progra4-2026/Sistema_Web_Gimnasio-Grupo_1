@@ -6,11 +6,14 @@ import './Mantenimiento.css';
 const OPCIONES = [
   { ruta: 'cursos', etiqueta: 'Cursos' },
   { ruta: 'clientes', etiqueta: 'Clientes' },
+  { ruta: 'instructores', etiqueta: 'Instructores' },
+  { ruta: 'administradores', etiqueta: 'Administradores' },
+  { ruta: 'parametros', etiqueta: 'Parámetros' },
 ];
 
 /**
- * Vista privada /mantenimiento: solo se llega con sesión iniciada (RutaPrivada en App.jsx).
- * Mismo Submenu reutilizable que en Servicios; cada pestaña es una ruta hija.
+ * Vista privada /mantenimiento: solo para el rol administrador (RutaPrivada en App.jsx y
+ * @PreAuthorize en el backend). Mismo Submenu reutilizable que en Servicios.
  */
 export default function MantenimientoLayout() {
   const { usuario } = useAuth();
@@ -19,7 +22,10 @@ export default function MantenimientoLayout() {
     <>
       <div className="titulo-seccion contenedor">
         <h1>Mantenimiento</h1>
-        <p>Sesión iniciada como <strong>{usuario.nombre}</strong>. Administrá los cursos y los clientes inscritos.</p>
+        <p>
+          Sesión iniciada como <strong>{usuario.nombre}</strong> (administrador). Administrá cursos, usuarios y
+          parámetros del sistema.
+        </p>
       </div>
 
       <Submenu opciones={OPCIONES} etiquetaAria="Submenú de mantenimiento" />

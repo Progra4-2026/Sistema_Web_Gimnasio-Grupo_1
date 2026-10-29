@@ -9,4 +9,6 @@ public interface HistorialCursoRepository extends JpaRepository<HistorialCurso, 
     boolean existsByCliente_Cedula(Long cedula);
 
     boolean existsByCurso_IdCurso(Long idCurso);
+
+    boolean existsByInstructor_CodInstructor(Long codInstructor);
 }

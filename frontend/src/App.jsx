@@ -18,6 +18,13 @@ import DesinscripcionPage from './pages/servicios/DesinscripcionPage';
 import MantenimientoLayout from './pages/mantenimiento/MantenimientoLayout';
 import MantenimientoCursosPage from './pages/mantenimiento/MantenimientoCursosPage';
 import MantenimientoClientesPage from './pages/mantenimiento/MantenimientoClientesPage';
+import MantenimientoInstructoresPage from './pages/mantenimiento/MantenimientoInstructoresPage';
+import MantenimientoAdministradoresPage from './pages/mantenimiento/MantenimientoAdministradoresPage';
+import MantenimientoParametrosPage from './pages/mantenimiento/MantenimientoParametrosPage';
+import InstructorLayout from './pages/instructor/InstructorLayout';
+import InstructorRutinasPage from './pages/instructor/InstructorRutinasPage';
+import InstructorMaquinasPage from './pages/instructor/InstructorMaquinasPage';
+import { ROLES } from './models/Usuario';
 
 /**
  * Rutas de la SPA (React Router). Navegar entre ellas no recarga la página.
@@ -27,13 +34,20 @@ import MantenimientoClientesPage from './pages/mantenimiento/MantenimientoClient
  *   /blog                      Blog
  *   /servicios/inscripcion     Inscripción      (también /inscripcion)
  *   /servicios/cursos          Cursos           (también /cursos)
- *   /servicios/rutinas         Rutinas          (también /rutinas)
+ *   /servicios/rutinas         Rutinas          (también /rutinas) — el cliente ve solo las suyas
  *   /servicios/maquinas        Máquinas
  *   /servicios/instructores    Instructores     (también /instructores)
  *   /servicios/desinscribirse  Desinscribirse
  *   /login                     Iniciar sesión
- *   /mantenimiento/cursos      Mantenimiento    — privada (RutaPrivada = AuthGuard)
- *   /mantenimiento/clientes    Mantenimiento    — privada
+ *
+ * Rutas privadas (RutaPrivada = AuthGuard por rol; el backend también verifica con @PreAuthorize):
+ *   /instructor/rutinas            Panel del instructor  — rol instructor
+ *   /instructor/maquinas           Panel del instructor  — rol instructor
+ *   /mantenimiento/cursos          Mantenimiento         — rol administrador
+ *   /mantenimiento/clientes        Mantenimiento         — rol administrador
+ *   /mantenimiento/instructores    Mantenimiento         — rol administrador
+ *   /mantenimiento/administradores Mantenimiento         — rol administrador
+ *   /mantenimiento/parametros      Mantenimiento         — rol administrador
  */
 export default function App() {
   return (
@@ -64,12 +78,23 @@ export default function App() {
                 <Route path="/rutinas" element={<Navigate to="/servicios/rutinas" replace />} />
                 <Route path="/instructores" element={<Navigate to="/servicios/instructores" replace />} />
 
-                {/* Rutas privadas: solo con sesión iniciada (AuthGuard) */}
-                <Route element={<RutaPrivada />}>
+                {/* Rutas privadas por rol (AuthGuard) */}
+                <Route element={<RutaPrivada roles={[ROLES.INSTRUCTOR]} />}>
+                  <Route path="/instructor" element={<InstructorLayout />}>
+                    <Route index element={<Navigate to="rutinas" replace />} />
+                    <Route path="rutinas" element={<InstructorRutinasPage />} />
+                    <Route path="maquinas" element={<InstructorMaquinasPage />} />
+                  </Route>
+                </Route>
+
+                <Route element={<RutaPrivada roles={[ROLES.ADMINISTRADOR]} />}>
                   <Route path="/mantenimiento" element={<MantenimientoLayout />}>
                     <Route index element={<Navigate to="cursos" replace />} />
                     <Route path="cursos" element={<MantenimientoCursosPage />} />
                     <Route path="clientes" element={<MantenimientoClientesPage />} />
+                    <Route path="instructores" element={<MantenimientoInstructoresPage />} />
+                    <Route path="administradores" element={<MantenimientoAdministradoresPage />} />
+                    <Route path="parametros" element={<MantenimientoParametrosPage />} />
                   </Route>
                 </Route>
 
