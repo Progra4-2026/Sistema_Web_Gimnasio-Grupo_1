@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Manual de Usuario — Gimnasio PowerFit</title>
+<style>
+  @page { size: Letter; margin: 2cm 2cm 2.2cm 2cm; }
+  :root { --azul: #1F3864; --azul2: #2F5496; --borde: #BFBFBF; --naranja: #ff5a1f; }
+  * { box-sizing: border-box; }
+  body { font-family: "Segoe UI", Calibri, Arial, sans-serif; font-size: 10.5pt; line-height: 1.45; color: #222; margin: 0; }
+  h1 { font-size: 17pt; color: var(--azul); border-bottom: 1.5px solid var(--azul); padding-bottom: 4px; margin: 0 0 12px; break-after: avoid; }
+  h2 { font-size: 12.5pt; color: var(--azul2); margin: 18px 0 8px; break-after: avoid; }
+  p { margin: 0 0 8px; }
+  ul, ol { margin: 0 0 10px; padding-left: 22px; } li { margin-bottom: 3px; }
+  code { font-family: Consolas, "Courier New", monospace; font-size: 9.3pt; background: #F4F6FA; padding: 0 3px; }
+  table { width: 100%; border-collapse: collapse; margin: 4px 0 12px; font-size: 9.6pt; }
+  th { background: var(--azul); color: #fff; text-align: left; padding: 5px 7px; border: 1px solid var(--borde); }
+  td { padding: 4px 7px; border: 1px solid var(--borde); vertical-align: top; }
+  tr { break-inside: avoid; }
+  .seccion { break-before: page; }
+  figure { margin: 8px 0 14px; text-align: center; break-inside: avoid; }
+  figure img { max-width: 100%; max-height: 10.5cm; border: 1px solid #D0D5DD; }
+  figure.media img { max-height: 7.5cm; }
+  figure.chica img { max-height: 5.8cm; }
+  figcaption { font-size: 9.4pt; margin-top: 4px; color: #333; }
+  .nota { background: #FFF6E5; border-left: 3px solid #E0A030; padding: 6px 10px; margin: 0 0 10px; font-size: 9.8pt; break-inside: avoid; }
+  .boton { display: inline-block; background: var(--naranja); color: #fff; font-weight: 600; font-size: 9pt; padding: 0 6px; border-radius: 4px; }
+  .portada { height: 22cm; display: flex; flex-direction: column; justify-content: center; text-align: center; }
+  .portada .inst { font-size: 13pt; font-weight: 700; } .portada .sub { font-size: 11.5pt; margin-top: 2px; }
+  .portada .titulo { font-size: 24pt; font-weight: 700; color: var(--azul); margin-top: 60px; }
+  .portada .subtitulo { font-size: 14pt; margin-top: 6px; }
+  .portada .grupo { margin-top: 70px; font-size: 11.5pt; }
+  .indice ol { font-size: 11pt; } .indice li { margin-bottom: 5px; }
+</style>
+</head>
+<body>
+
+<section class="portada">
+  <div class="inst">Universidad Nacional</div>
+  <div class="sub">Escuela de Informática</div>
+  <div class="sub">Programación 4 (EIF209) — II Ciclo 2026</div>
+  <div class="titulo">Manual de Usuario</div>
+  <div class="subtitulo">Sistema Web Gimnasio PowerFit</div>
+  <div class="grupo">
+    <b>Grupo 1</b><br>
+    Christopher Blanco Solano<br>
+    Alexander Dittel Escobar<br>
+    Aslehy Claret Aguilar Perez<br><br>
+    Profesora: Marianella Solano Orias<br>
+    Octubre 2026
+  </div>
+</section>
+
+<section class="seccion indice">
+  <h1>Contenido</h1>
+  <ol>
+    <li>Introducción</li>
+    <li>Navegación general</li>
+    <li>Operaciones del visitante (sin sesión)</li>
+    <li>Iniciar y cerrar sesión</li>
+    <li>Operaciones del cliente</li>
+    <li>Operaciones del instructor</li>
+    <li>Operaciones del administrador</li>
+    <li>Mensajes y problemas frecuentes</li>
+  </ol>
+</section>
+
+<!-- 1 -->
+<section class="seccion">
+  <h1>1. Introducción</h1>
+  <p>Gimnasio PowerFit es un sistema web para la gestión de un gimnasio. Permite a los visitantes conocer el gimnasio e inscribirse a una rutina o a un curso, y a cada tipo de usuario realizar las operaciones de su rol después de iniciar sesión.</p>
+
+  <h2>Cómo acceder</h2>
+  <p>Con el sistema en ejecución (ver el README del proyecto), abrí en el navegador la dirección <code>http://localhost:5173</code>. La aplicación funciona en una sola página: al navegar entre secciones no se recarga la página completa.</p>
+
+  <h2>Roles del sistema</h2>
+  <table>
+    <tr><th style="width:22%">Rol</th><th style="width:28%">Cómo ingresa</th><th>Qué puede hacer</th></tr>
+    <tr><td>Visitante</td><td>Sin iniciar sesión</td><td>Ver la información del gimnasio, los cursos, las máquinas y los instructores; inscribirse; enviar consultas.</td></tr>
+    <tr><td>Cliente</td><td>Usuario: su cédula</td><td>Ver <b>solo sus propias</b> rutinas y retirar su inscripción.</td></tr>
+    <tr><td>Instructor</td><td>Usuario: su código</td><td>Gestionar las rutinas de los clientes y las máquinas.</td></tr>
+    <tr><td>Administrador</td><td>Usuario: su código</td><td>Gestionar cursos, clientes, instructores, administradores y parámetros del sistema.</td></tr>
+  </table>
+
+  <h2>Usuarios de prueba</h2>
+  <table>
+    <tr><th>Rol</th><th>Usuario</th><th>Contraseña</th></tr>
+    <tr><td>Cliente</td><td><code>201</code> (o cualquier cédula de los datos de prueba)</td><td><code>201</code> (su propia cédula)</td></tr>
+    <tr><td>Instructor</td><td><code>100</code> (o cualquier código de instructor)</td><td><code>100</code> (su propio código)</td></tr>
+    <tr><td>Administrador</td><td><code>1</code></td><td><code>admin123</code></td></tr>
+  </table>
+  <p class="nota">Un cliente que se inscribe desde la web ingresa con la cédula y la contraseña que escribió en el formulario de inscripción.</p>
+</section>
+
+<!-- 2 -->
+<section class="seccion">
+  <h1>2. Navegación general</h1>
+  <p>Todas las vistas comparten la misma estructura:</p>
+  <ul>
+    <li><b>Barra de navegación</b> (arriba): Inicio, Contactos, Servicios y Blog. Con sesión iniciada aparece además la sección del rol (<i>Mis rutinas</i>, <i>Panel instructor</i> o <i>Mantenimiento</i>), el nombre del usuario y el botón <b>Cerrar sesión</b>. Sin sesión aparece el botón <span class="boton">Ingresar</span>.</li>
+    <li><b>Contenido</b> de la sección elegida.</li>
+    <li><b>Pie de página</b> con enlaces y el horario del gimnasio.</li>
+    <li><b>Mensajes emergentes</b> (abajo a la derecha): confirman una operación (verde) o informan un error (rojo). Se cierran solos o con la <b>×</b>.</li>
+  </ul>
+  <p>En pantallas pequeñas (celular), las opciones de la barra se muestran con el botón <b>Menú</b>.</p>
+  <figure><img src="manual_capturas/01-inicio.png" alt="Inicio"><figcaption><b>Figura 1.</b> Página de Inicio con la barra de navegación y las fotos de las instalaciones.</figcaption></figure>
+  <p>La página de <b>Servicios</b> tiene un submenú con sus secciones: Inscripción, Cursos, Rutinas, Máquinas, Instructores y Desinscribirse.</p>
+</section>
+
+<!-- 3 -->
+<section class="seccion">
+  <h1>3. Operaciones del visitante (sin sesión)</h1>
+
+  <h2>3.1 Inscribirse en el gimnasio</h2>
+  <ol>
+    <li>En la barra de navegación, entrá a <b>Servicios</b>. Se abre la sección <b>Inscripción</b> (también desde el botón <i>Inscribirme ahora</i> de Inicio).</li>
+    <li>Completá tus datos: nombre completo, cédula (9 a 12 dígitos), correo, teléfono (<code>8888-8888</code>) y fecha de nacimiento (edad mínima 14 años).</li>
+    <li>En <b>Tipo de inscripción</b> elegí <i>Curso grupal</i> o <i>Rutina personalizada</i>. Según la opción aparece el campo <b>Curso</b> (los cursos sin cupos aparecen deshabilitados) o <b>Objetivo</b>.</li>
+    <li>Escribí una contraseña de al menos 8 caracteres. Con tu cédula y esta contraseña vas a iniciar sesión.</li>
+    <li>Presioná <span class="boton">Inscribirme</span>.</li>
+  </ol>
+  <figure><img src="manual_capturas/04-inscripcion-llena.png" alt="Formulario de inscripción completo"><figcaption><b>Figura 2.</b> Formulario de inscripción completo para un curso grupal.</figcaption></figure>
+  <p>Si algún dato no es válido, el formulario no se envía y cada campo muestra en rojo qué corregir:</p>
+  <figure class="media"><img src="manual_capturas/03-inscripcion-errores.png" alt="Errores de validación"><figcaption><b>Figura 3.</b> Mensajes de validación al enviar el formulario incompleto.</figcaption></figure>
+  <p>Al inscribirte correctamente aparece un mensaje de confirmación y, si elegiste un curso, se descuenta un cupo:</p>
+  <figure class="media"><img src="manual_capturas/05-inscripcion-exito.png" alt="Inscripción exitosa"><figcaption><b>Figura 4.</b> Confirmación de la inscripción.</figcaption></figure>
+
+  <h2>3.2 Consultar cursos, máquinas e instructores</h2>
+  <p>En <b>Servicios</b>, usá el submenú:</p>
+  <ul>
+    <li><b>Cursos:</b> horario, detalle y cupos de cada curso. Un curso sin cupos se marca como <i>Sin cupos</i>. El botón <i>Inscribirme</i> de una tarjeta abre la inscripción con ese curso ya elegido.</li>
+    <li><b>Máquinas:</b> el equipo del gimnasio y su estado (bueno, excelente, regular).</li>
+    <li><b>Instructores:</b> el equipo de instructores.</li>
+  </ul>
+  <figure><img src="manual_capturas/06-cursos.png" alt="Cursos"><figcaption><b>Figura 5.</b> Sección Cursos.</figcaption></figure>
+  <figure class="media"><img src="manual_capturas/07-maquinas.png" alt="Máquinas"><figcaption><b>Figura 6.</b> Sección Máquinas.</figcaption></figure>
+  <figure class="media"><img src="manual_capturas/08-instructores.png" alt="Instructores"><figcaption><b>Figura 7.</b> Sección Instructores.</figcaption></figure>
+
+  <h2>3.3 Enviar una consulta</h2>
+  <ol>
+    <li>Entrá a <b>Contactos</b>. A la izquierda están la dirección, el teléfono y el correo del gimnasio.</li>
+    <li>Completá el formulario: nombre, correo, teléfono, asunto y mensaje (10 a 500 caracteres).</li>
+    <li>Presioná <span class="boton">Enviar consulta</span>. Aparece un mensaje de confirmación.</li>
+  </ol>
+  <figure><img src="manual_capturas/10-contacto.png" alt="Contactos"><figcaption><b>Figura 8.</b> Página de Contactos con el formulario de consultas.</figcaption></figure>
+
+  <h2>3.4 Blog</h2>
+  <p>En <b>Blog</b> hay enlaces a artículos externos de salud, rutinas de ejercicio, recetas y dietas. Cada enlace se abre en una pestaña nueva.</p>
+  <figure class="media"><img src="manual_capturas/11-blog.png" alt="Blog"><figcaption><b>Figura 9.</b> Página de Blog.</figcaption></figure>
+</section>
+
+<!-- 4 -->
+<section class="seccion">
+  <h1>4. Iniciar y cerrar sesión</h1>
+  <h2>Iniciar sesión</h2>
+  <ol>
+    <li>Presioná <span class="boton">Ingresar</span> en la barra de navegación.</li>
+    <li>En <b>Usuario</b> escribí tu cédula (cliente) o tu código (instructor o administrador).</li>
+    <li>Escribí tu contraseña y presioná <span class="boton">Iniciar sesión</span>.</li>
+  </ol>
+  <p>El sistema te lleva a la sección de tu rol. Si antes intentaste abrir una página privada, vuelve a esa página.</p>
+  <figure class="chica"><img src="manual_capturas/12-login.png" alt="Iniciar sesión"><figcaption><b>Figura 10.</b> Pantalla de inicio de sesión.</figcaption></figure>
+  <p>Si el usuario o la contraseña son incorrectos, aparece el mensaje <i>"Usuario o contraseña incorrectos."</i>. Por seguridad no se indica cuál de los dos falló.</p>
+  <figure class="chica"><img src="manual_capturas/13-login-error.png" alt="Error de inicio de sesión"><figcaption><b>Figura 11.</b> Error de inicio de sesión.</figcaption></figure>
+  <h2>Cerrar sesión</h2>
+  <p>Presioná <b>Cerrar sesión</b> en la barra de navegación. La sesión también se cierra sola después de 30 minutos sin actividad.</p>
+</section>
+
+<!-- 5 -->
+<section class="seccion">
+  <h1>5. Operaciones del cliente</h1>
+  <h2>5.1 Ver mis rutinas</h2>
+  <ol>
+    <li>Iniciá sesión con tu cédula.</li>
+    <li>Entrá a <b>Mis rutinas</b> en la barra (o a <b>Servicios → Rutinas</b>).</li>
+  </ol>
+  <p>Se muestran únicamente <b>tus</b> rutinas: fecha, máquina, horas e instructor, y el total de horas. Ningún cliente puede ver las rutinas de otro.</p>
+  <figure><img src="manual_capturas/14-cliente-mis-rutinas.png" alt="Mis rutinas"><figcaption><b>Figura 12.</b> Rutinas del cliente con sesión iniciada.</figcaption></figure>
+  <p class="nota">Sin sesión, la sección Rutinas pide iniciar sesión (formulario de ingreso dentro de la misma sección).</p>
+
+  <h2>5.2 Retirar mi inscripción</h2>
+  <ol>
+    <li>Con sesión iniciada, entrá a <b>Servicios → Desinscribirse</b>. Tu cédula aparece fija: solo podés retirar tu propia inscripción.</li>
+    <li>Presioná <span class="boton" style="background:#c62828">Confirmar desinscripción</span>.</li>
+    <li>En la ventana de confirmación, aceptá. Tu cuenta se elimina, se libera el cupo de tu curso y la sesión se cierra.</li>
+  </ol>
+  <figure class="chica"><img src="manual_capturas/15-cliente-desinscribirse.png" alt="Desinscribirse"><figcaption><b>Figura 13.</b> Desinscripción del cliente.</figcaption></figure>
+  <p class="nota">Si el cliente tiene rutinas o historial de cursos registrados, el sistema no permite eliminarlo y lo informa con un mensaje.</p>
+
+  <h2>5.3 Secciones de otros roles</h2>
+  <p>Si un usuario intenta abrir una sección que no corresponde a su rol (por ejemplo, un cliente en Mantenimiento), el sistema muestra <i>Acceso denegado</i> y un botón para volver a su sección.</p>
+  <figure class="chica"><img src="manual_capturas/16-acceso-denegado.png" alt="Acceso denegado"><figcaption><b>Figura 14.</b> Acceso denegado por rol.</figcaption></figure>
+</section>
+
+<!-- 6 -->
+<section class="seccion">
+  <h1>6. Operaciones del instructor</h1>
+  <p>Iniciá sesión con tu código y entrá a <b>Panel instructor</b>. El panel tiene dos pestañas: <b>Rutinas</b> y <b>Máquinas</b>.</p>
+
+  <h2>6.1 Gestionar rutinas</h2>
+  <p>La tabla muestra las rutinas de todos los clientes. Usá <b>Buscar por cliente</b> para filtrar por cédula o nombre.</p>
+  <ul>
+    <li><b>Asignar una rutina:</b> presioná <span class="boton">+ Asignar rutina</span>, completá la cédula del cliente, la máquina, la fecha y las horas, y guardá.</li>
+    <li><b>Modificar:</b> presioná <b>Editar</b> en la fila, cambiá los datos y guardá.</li>
+    <li><b>Eliminar:</b> presioná <span class="boton" style="background:#c62828">Eliminar</span> y confirmá.</li>
+  </ul>
+  <figure><img src="manual_capturas/17-instructor-rutinas.png" alt="Rutinas del instructor"><figcaption><b>Figura 15.</b> Gestión de rutinas en el panel del instructor.</figcaption></figure>
+
+  <h2>6.2 Gestionar máquinas</h2>
+  <ol>
+    <li>Abrí la pestaña <b>Máquinas</b>.</li>
+    <li>Para agregar, presioná <span class="boton">+ Nueva máquina</span>, escribí la descripción, elegí el estado y presioná <b>Guardar</b>.</li>
+    <li>Para modificar o eliminar, usá <b>Editar</b> o <b>Eliminar</b> en la fila. No se puede eliminar una máquina que tenga rutinas asociadas.</li>
+  </ol>
+  <figure class="media"><img src="manual_capturas/18-instructor-maquinas.png" alt="Máquinas del instructor"><figcaption><b>Figura 16.</b> Listado de máquinas.</figcaption></figure>
+  <figure class="media"><img src="manual_capturas/19-instructor-nueva-maquina.png" alt="Nueva máquina"><figcaption><b>Figura 17.</b> Formulario de nueva máquina.</figcaption></figure>
+</section>
+
+<!-- 7 -->
+<section class="seccion">
+  <h1>7. Operaciones del administrador</h1>
+  <p>Iniciá sesión con tu código y entrá a <b>Mantenimiento</b>. Las pestañas son: Cursos, Clientes, Instructores, Administradores y Parámetros. En todas, <b>Editar</b> abre el formulario con los datos actuales y <b>Eliminar</b> pide confirmación antes de borrar.</p>
+
+  <h2>7.1 Cursos</h2>
+  <p>Presioná <span class="boton">+ Nuevo curso</span> e ingresá nombre, descripción, horario, cupos disponibles (0 a 100) e imagen. No se puede eliminar un curso con clientes inscritos o con historial.</p>
+  <figure class="media"><img src="manual_capturas/20-admin-cursos.png" alt="Cursos"><figcaption><b>Figura 18.</b> Mantenimiento de cursos.</figcaption></figure>
+
+  <h2>7.2 Clientes</h2>
+  <p>Lista de clientes con su inscripción. Desde <b>Editar</b> se actualizan los datos de contacto; la cédula y el curso no se pueden cambiar. Los clientes de los datos de prueba aparecen como <i>Registrado en el gimnasio</i>.</p>
+  <figure class="media"><img src="manual_capturas/21-admin-clientes.png" alt="Clientes"><figcaption><b>Figura 19.</b> Mantenimiento de clientes.</figcaption></figure>
+
+  <h2>7.3 Instructores y administradores</h2>
+  <p>Con <span class="boton">+ Nuevo instructor</span> se registran nombre, dirección, correo, celular, fecha de contratación y contraseña (con confirmación). Con <span class="boton">+ Nuevo administrador</span>, nombre, correo y contraseña. El sistema asigna el código con el que ese usuario va a iniciar sesión. Un administrador no puede eliminar su propia cuenta.</p>
+  <figure class="chica"><img src="manual_capturas/22-admin-instructores.png" alt="Instructores"><figcaption><b>Figura 20.</b> Mantenimiento de instructores.</figcaption></figure>
+  <figure class="chica"><img src="manual_capturas/23-admin-administradores.png" alt="Administradores"><figcaption><b>Figura 21.</b> Mantenimiento de administradores.</figcaption></figure>
+
+  <h2>7.4 Parámetros del sistema</h2>
+  <ol>
+    <li>Abrí la pestaña <b>Parámetros</b>: nombre del gimnasio, horario de atención, teléfono, correo, capacidad máxima y horas máximas por rutina.</li>
+    <li>Presioná <b>Editar</b> en el parámetro, escribí el nuevo valor y presioná <b>Guardar</b>.</li>
+  </ol>
+  <figure class="chica"><img src="manual_capturas/24-admin-parametros.png" alt="Parámetros"><figcaption><b>Figura 22.</b> Parámetros del sistema.</figcaption></figure>
+  <figure class="chica"><img src="manual_capturas/25-admin-editar-parametro.png" alt="Editar parámetro"><figcaption><b>Figura 23.</b> Edición de un parámetro.</figcaption></figure>
+</section>
+
+<!-- 8 -->
+<section class="seccion">
+  <h1>8. Mensajes y problemas frecuentes</h1>
+  <table>
+    <tr><th style="width:38%">Mensaje o situación</th><th>Qué significa / qué hacer</th></tr>
+    <tr><td>Un campo aparece en rojo con un mensaje</td><td>El dato no cumple el formato. Corregilo según el mensaje y volvé a enviar.</td></tr>
+    <tr><td>"Ya existe una inscripción con la cédula…"</td><td>Esa cédula ya está inscrita. Iniciá sesión con ella en lugar de inscribirte de nuevo.</td></tr>
+    <tr><td>"El curso … no tiene cupos disponibles."</td><td>Elegí otro curso o una rutina personalizada.</td></tr>
+    <tr><td>"Usuario o contraseña incorrectos."</td><td>Revisá el usuario (cédula o código) y la contraseña.</td></tr>
+    <tr><td>Acceso denegado</td><td>La sección pertenece a otro rol. Usá el botón para ir a tu sección.</td></tr>
+    <tr><td>La sección privada pide iniciar sesión</td><td>La sesión no está iniciada o venció después de 30 minutos sin actividad.</td></tr>
+    <tr><td>"No se puede eliminar…" al borrar un registro</td><td>El registro tiene datos relacionados (inscritos, rutinas o historial). Eliminá o reasigná primero esos datos.</td></tr>
+    <tr><td>"No se pudo conectar con el servidor"</td><td>El backend no está en ejecución. Levantalo siguiendo el README.</td></tr>
+  </table>
+</section>
+
+</body>
+</html>

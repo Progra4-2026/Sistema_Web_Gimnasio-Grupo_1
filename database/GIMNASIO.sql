@@ -296,6 +296,12 @@ INSERT INTO parametros_sistema (clave, valor, descripcion) VALUES ('correo_conta
 INSERT INTO parametros_sistema (clave, valor, descripcion) VALUES ('capacidad_maxima', '100', 'Cantidad máxima de personas dentro del gimnasio');
 INSERT INTO parametros_sistema (clave, valor, descripcion) VALUES ('horas_maximas_rutina', '4', 'Horas máximas recomendadas por rutina diaria');
 
+-- Administrador de demostración (usuario 1 / contraseña admin123).
+-- La contraseña se guarda cifrada con BCrypt; nunca en texto plano.
+-- Las contraseñas de clientes e instructores de prueba las completa el backend
+-- al arrancar (config/CargaInicialDatosRunner): cada uno usa su cédula o código.
+INSERT INTO administradores (cod_administrador, nombre, e_mail, password_hash) VALUES (1, 'Administrador', 'admin@powerfit.cr', '$2a$10$PpBlBEb1dKA1c.Tb/pXLuutzKfWTtJ/Gw7fk398nbwyyy2kHtRmOy');
+
 -- ============================================================
 -- Consultas de análisis (convertidas de Oracle a MySQL)
 -- ============================================================

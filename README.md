@@ -25,6 +25,20 @@ Avance por entregable:
 - **Entregable 1:** acta de constitución, ambiente de desarrollo y modelo de datos (`docs/`, `database/GIMNASIO.sql`).
 - **Entregable 2:** páginas HTML5/CSS3 responsive: Inicio, Contactos, Servicios y Blog.
 - **Entregable 3:** JavaScript del lado del cliente: validación de formularios, eventos y manipulación del DOM, `fetch` con `async/await` contra el backend, `localStorage` / `sessionStorage` y mensajes de éxito/error sin recargar la página.
+- **Entregable 4:** backend con Spring Boot + JPA/Hibernate: entidades, repositorios, servicios, sesiones HTTP, servicios REST y SOAP, patrones Singleton, Observer e Iterator, validación y manejo central de errores.
+- **Entregable 5:** SPA en React con React Router, componentes reutilizables, Context, capas `components/`, `services/` y `models/`, y guard de rutas.
+- **Entregable 6 (entrega final):** login para los tres roles, contraseñas con BCrypt, autorización por roles, CORS, cabeceras de seguridad, documentación técnica y manual de usuario.
+
+## Documentación
+
+| Documento | Ubicación |
+|---|---|
+| Documentación técnica (arquitectura, componentes, despliegue, casos de uso, instalación) | [`docs/Documentacion_Tecnica.pdf`](docs/Documentacion_Tecnica.pdf) |
+| Manual de usuario (capturas de cada vista y pasos de las operaciones principales) | [`docs/Manual_Usuario.pdf`](docs/Manual_Usuario.pdf) |
+| Servicio SOAP (WSDL, XSD y ejemplos) | [`docs/soap/`](docs/soap/README.md) |
+| Script de la base de datos (tablas y datos de prueba) | [`database/GIMNASIO.sql`](database/GIMNASIO.sql) |
+
+Las fuentes HTML de los PDF están en `docs/documentacion/`.
 
 ## Requisitos previos
 
@@ -35,6 +49,16 @@ Antes de clonar, asegurate de tener instalado:
 - **Node.js** v20 o superior (incluye npm) — [nodejs.org](https://nodejs.org)
 - **MySQL** 8 o superior, corriendo localmente
 - **Git**
+
+## Despliegue paso a paso
+
+El sistema tiene tres partes que se levantan **en este orden**: base de datos → backend → frontend. Cada una corre en su propio puerto:
+
+| Parte | Puerto | Se levanta con |
+|---|---|---|
+| MySQL | 3306 | el servicio de MySQL instalado |
+| Backend (Spring Boot) | 8080 | IntelliJ o `./mvnw spring-boot:run` |
+| Frontend (Vite / Node.js) | 5173 | `npm run dev` |
 
 ## 1. Clonar el repositorio
 
@@ -84,7 +108,8 @@ DB_PASSWORD=tu_contraseña_de_mysql
 
 3. Dejá que IntelliJ descargue las dependencias de Maven (barra de progreso inferior).
 4. Ejecutá la clase principal `GimnasioBackendApplication.java` (botón ▶️ o `Run`).
-5. El servidor queda escuchando en `http://localhost:8080`.
+   - Sin IntelliJ, desde una terminal en `backend/`: `./mvnw spring-boot:run` (en Windows: `mvnw.cmd spring-boot:run`).
+5. El servidor queda escuchando en `http://localhost:8080`. Al arrancar, completa las contraseñas de los usuarios de prueba (ver [Login y roles](#login-y-roles-entregable-6)).
 
 **Verificación:** abrí `http://localhost:8080/api/health` en el navegador. Debe responder:
 
@@ -106,11 +131,44 @@ npm run dev
 
 Abrí en el navegador la URL que indique la terminal (por defecto `http://localhost:5173`).
 
-Deberías ver el componente principal mostrando **"Sistema Web Gimnasio - Grupo 1"**.
+Deberías ver la página de **Inicio** de Gimnasio PowerFit. Toda la aplicación es una SPA de React: las secciones (Servicios, Contactos, Blog, Mantenimiento…) cambian sin recargar la página.
 
-## 5. Ver las páginas del sitio (Entregables 2 y 3)
+## 5. Verificar que todo funciona
 
-Con el mismo servidor de Vite corriendo (`npm run dev`), las páginas se sirven directamente desde `frontend/public/`, sin pasar por React:
+1. En `http://localhost:5173`, entrá a **Servicios → Cursos**: tiene que aparecer la lista de cursos (viene del backend y de MySQL).
+2. Presioná **Ingresar** e iniciá sesión como administrador: usuario `1`, contraseña `admin123`. Tenés que llegar a **Mantenimiento**.
+3. Cerrá sesión e ingresá como instructor (`100` / `100`) → **Panel instructor**, y como cliente (`201` / `201`) → **Mis rutinas**.
+
+El paso a paso de cada operación, con capturas, está en el [manual de usuario](docs/Manual_Usuario.pdf).
+
+### Problemas frecuentes
+
+| Problema | Solución |
+|---|---|
+| El backend no arranca: `Access denied for user 'root'` | La contraseña de MySQL no es `root`: creá `backend/.env` (paso 3.2). |
+| El backend no arranca: `Unknown database 'gimnasio_db'` o falta una tabla | Ejecutá `database/GIMNASIO.sql` (paso 2). Si venías de un entregable anterior, ejecutalo de nuevo. |
+| `Port 8080 was already in use` o `Port 5173 is in use` | Ya hay otra instancia corriendo: cerrala o detené el proceso que usa ese puerto. |
+| La página muestra "No se pudo conectar con el servidor" | El backend no está corriendo o no terminó de arrancar (revisá `http://localhost:8080/api/health`). |
+| El login falla con un usuario de prueba | Reiniciá el backend: al arrancar completa las contraseñas de prueba que falten. |
+| `npm run dev` falla con módulos faltantes | Ejecutá `npm install` dentro de `frontend/`. |
+
+## 6. Despliegue para producción (opcional)
+
+En lugar de los servidores de desarrollo, se pueden generar los artefactos finales:
+
+```bash
+cd backend && ./mvnw clean package && java -jar target/*.jar
+```
+
+```bash
+cd frontend && npm run build
+```
+
+`npm run build` deja el frontend compilado en `frontend/dist/`, que puede servir cualquier servidor web (por ejemplo Apache de XAMPP o `npm run preview`). El servidor debe redirigir las rutas de la SPA a `index.html`, y la URL del frontend tiene que estar en `app.cors.origenes-permitidos` (`backend/src/main/resources/application.properties`). En producción el sitio debe publicarse con HTTPS: así Spring Security envía también la cabecera `Strict-Transport-Security`.
+
+## Anexo: páginas HTML de los Entregables 2 y 3
+
+Las páginas estáticas de los primeros entregables se conservan como referencia. No forman parte de la SPA. Con el servidor de Vite corriendo (`npm run dev`), se sirven directamente desde `frontend/public/`:
 - http://localhost:5173/html/inicio.html
 - http://localhost:5173/html/blog.html
 - http://localhost:5173/html/contacto.html
