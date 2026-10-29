@@ -9,6 +9,8 @@ const ENLACES = [
   { ruta: '/contacto', etiqueta: 'Contactos' },
   { ruta: '/servicios', etiqueta: 'Servicios' },
   { ruta: '/blog', etiqueta: 'Blog' },
+  // Vista privada: si no hay sesión, RutaPrivada redirige a /login
+  { ruta: '/mantenimiento', etiqueta: 'Mantenimiento' },
 ];
 
 export default function Navbar() {
@@ -21,9 +23,14 @@ export default function Navbar() {
   }
 
   async function manejarCerrarSesion() {
-    await cerrarSesion();
-    notificar('info', 'Sesión cerrada.');
-    setMenuAbierto(false);
+    try {
+      await cerrarSesion();
+      notificar('info', 'Sesión cerrada.');
+    } catch (error) {
+      notificar('error', error.message);
+    } finally {
+      setMenuAbierto(false);
+    }
   }
 
   return (
@@ -56,6 +63,12 @@ export default function Navbar() {
           {!usuario && (
             <NavLink to="/login" className="boton boton-secundario" onClick={manejarClicEnlace}>
               Iniciar sesión
+            </NavLink>
+          )}
+
+          {!usuario && (
+            <NavLink to="/login" className="boton boton-ingresar" onClick={manejarClicEnlace}>
+              Ingresar
             </NavLink>
           )}
 

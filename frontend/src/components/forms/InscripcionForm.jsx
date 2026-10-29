@@ -15,6 +15,14 @@ const VALOR_INICIAL = {
   password: '',
 };
 
+// Deben coincidir con los objetivos que acepta el backend (InscripcionServiceImpl.OBJETIVOS)
+const OBJETIVOS_RUTINA = [
+  { valor: 'fuerza', texto: 'Ganar fuerza y masa muscular' },
+  { valor: 'resistencia', texto: 'Mejorar la resistencia cardiovascular' },
+  { valor: 'peso', texto: 'Bajar de peso' },
+  { valor: 'flexibilidad', texto: 'Flexibilidad y movilidad' },
+];
+
 const PATRON_NOMBRE = /^[A-Za-zÁÉÍÓÚáéíóúÑñÜü ]{3,80}$/;
 const PATRON_CEDULA = /^[0-9]{9,12}$/;
 const PATRON_TELEFONO = /^[0-9]{4}-?[0-9]{4}$/;
@@ -40,7 +48,7 @@ function validar(datos) {
   else if (calcularEdad(datos.fechaNacimiento) < 14) errores.fechaNacimiento = 'Edad mínima para inscribirse: 14 años.';
   if (!datos.tipoInscripcion) errores.tipoInscripcion = 'Seleccioná un tipo de inscripción.';
   if (datos.tipoInscripcion === 'curso' && !datos.idCurso) errores.idCurso = 'Seleccioná un curso.';
-  if (datos.tipoInscripcion === 'rutina' && datos.objetivo.trim().length < 3) errores.objetivo = 'Contanos tu objetivo.';
+  if (datos.tipoInscripcion === 'rutina' && !datos.objetivo) errores.objetivo = 'Seleccioná tu objetivo.';
   if (datos.password.length < 8) errores.password = 'Mínimo 8 caracteres.';
 
   return errores;
@@ -53,9 +61,12 @@ export default function InscripcionForm({ cursos, cursoSeleccionadoId, onInscrip
   const [ultimoCursoAplicado, setUltimoCursoAplicado] = useState(null);
   const { notificar } = useNotificacion();
 
+  // Curso elegido desde una tarjeta (prop que baja desde la página): se aplica una vez al formulario
   if (cursoSeleccionadoId && cursoSeleccionadoId !== ultimoCursoAplicado) {
     setUltimoCursoAplicado(cursoSeleccionadoId);
     setDatos((anterior) => ({ ...anterior, tipoInscripcion: 'curso', idCurso: String(cursoSeleccionadoId) }));
+  } else if (!cursoSeleccionadoId && ultimoCursoAplicado) {
+    setUltimoCursoAplicado(null); // permite volver a elegir el mismo curso más adelante
   }
 
   function manejarCambio(evento) {
@@ -136,7 +147,9 @@ export default function InscripcionForm({ cursos, cursoSeleccionadoId, onInscrip
           <select id="ins-curso" name="idCurso" value={datos.idCurso} onChange={manejarCambio}>
             <option value="">Seleccione un curso</option>
             {cursos.map((curso) => (
-              <option key={curso.id} value={curso.id}>{curso.descripcion}</option>
+              <option key={curso.id} value={curso.id} disabled={Number(curso.cupos) <= 0}>
+                {Number(curso.cupos) <= 0 ? `${curso.descripcion} (sin cupos)` : curso.descripcion}
+              </option>
             ))}
           </select>
           {errores.idCurso && <p className="texto-error">{errores.idCurso}</p>}
@@ -146,7 +159,12 @@ export default function InscripcionForm({ cursos, cursoSeleccionadoId, onInscrip
       {datos.tipoInscripcion === 'rutina' && (
         <div className="campo-formulario">
           <label htmlFor="ins-objetivo">Objetivo <span className="obligatorio">*</span></label>
-          <input id="ins-objetivo" name="objetivo" value={datos.objetivo} onChange={manejarCambio} placeholder="Ej: Ganar masa muscular" />
+          <select id="ins-objetivo" name="objetivo" value={datos.objetivo} onChange={manejarCambio}>
+            <option value="">Seleccioná tu objetivo</option>
+            {OBJETIVOS_RUTINA.map((objetivo) => (
+              <option key={objetivo.valor} value={objetivo.valor}>{objetivo.texto}</option>
+            ))}
+          </select>
           {errores.objetivo && <p className="texto-error">{errores.objetivo}</p>}
         </div>
       )}
