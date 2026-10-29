@@ -76,3 +76,25 @@
 .bloque-blog {
   margin: 2rem 0;
 }
+
+/* Botón secundario sobre el fondo oscuro de la portada: se ve relleno y se invierte al pasar el mouse */
+.hero-inicio .boton-secundario {
+  background-color: var(--color-secundario, #1a1a2e);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.7);
+}
+
+.hero-inicio .boton-secundario:hover,
+.hero-inicio .boton-secundario:focus-visible {
+  background-color: #fff;
+  color: var(--color-secundario, #1a1a2e);
+  border-color: #fff;
+}
+
+/* Página de inicio de sesión: tarjeta centrada con los campos uno debajo del otro */
+.tarjeta-login {
+  max-width: 420px;
+  margin: 0 auto;
+  padding: 2rem;
+  overflow: visible;
+}

@@ -8,7 +8,7 @@ import './Forms.css';
  * cliente → cédula, instructor → código de instructor, administrador → código de administrador.
  * onExito recibe el usuario para que la página decida a dónde redirigir.
  */
-export default function LoginForm({ onExito }) {
+export default function LoginForm({ onExito, apilado = false }) {
   const [datos, setDatos] = useState({ cedula: '', password: '' });
   const [error, setError] = useState('');
   const [enviando, setEnviando] = useState(false);
@@ -41,7 +41,7 @@ export default function LoginForm({ onExito }) {
   }
 
   return (
-    <form className="formulario formulario-inline" onSubmit={manejarEnvio}>
+    <form className={apilado ? 'formulario formulario-login' : 'formulario formulario-inline'} onSubmit={manejarEnvio}>
       <div className="campo-formulario">
         <label htmlFor="login-usuario">Usuario</label>
         <input id="login-usuario" name="cedula" value={datos.cedula} onChange={manejarCambio} placeholder="Cédula o código" inputMode="numeric" autoComplete="username" required />
