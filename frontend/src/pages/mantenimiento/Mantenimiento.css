@@ -1,0 +1,32 @@
+.barra-acciones {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.barra-acciones h2 {
+  margin: 0;
+}
+
+.tabla-contenedor {
+  overflow-x: auto;
+}
+
+.tabla-acciones {
+  display: flex;
+  gap: 0.5rem;
+  white-space: nowrap;
+}
+
+.boton-pequeno {
+  padding: 0.35rem 0.8rem;
+  font-size: 0.85rem;
+}
+
+
+.filtro-tabla {
+  max-width: 320px;
+}

@@ -1,4 +1,4 @@
-.submenu-servicios {
+.submenu {
   background: var(--color-fondo, #f7f7fa);
   border-bottom: 1px solid var(--color-borde, #e0e0e6);
   position: sticky;
@@ -6,31 +6,29 @@
   z-index: 10;
 }
 
-.submenu-servicios ul {
+.submenu ul {
   display: flex;
   gap: 1.25rem;
   list-style: none;
   padding: 0.75rem 1.25rem;
-  margin: 0;
+  margin: 0 auto;
   overflow-x: auto;
 }
 
-.submenu-servicios a {
+.submenu a {
   color: var(--color-secundario, #1a1a2e);
   font-weight: 600;
   white-space: nowrap;
   text-decoration: none;
+  padding-bottom: 0.15rem;
+  border-bottom: 2px solid transparent;
 }
 
-.submenu-servicios a:hover {
+.submenu a:hover {
   color: var(--color-primario, #ff5a1f);
 }
 
-.seccion-servicio {
-  padding: 2.5rem 0;
-  border-bottom: 1px solid var(--color-borde, #e0e0e6);
-}
-
-.seccion-servicio:last-child {
-  border-bottom: none;
+.submenu a.activo {
+  color: var(--color-primario, #ff5a1f);
+  border-bottom-color: var(--color-primario, #ff5a1f);
 }

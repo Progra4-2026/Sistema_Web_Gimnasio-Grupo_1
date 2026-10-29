@@ -12,6 +12,7 @@ import com.grupo1.gimnasio.gimnasio_backend.services.AutenticacionService;
 import com.grupo1.gimnasio.gimnasio_backend.services.InscripcionService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,13 +30,16 @@ import java.util.Map;
 /**
  * CRUD de inscripciones — /api/inscripciones
  *
- *   GET    /api/inscripciones            200 lista (sin contraseñas)
- *   GET    /api/inscripciones/mia        200 la del usuario en sesión | 401 sin sesión
- *   GET    /api/inscripciones/estadisticas  200 conteo que lleva el Observer EstadisticasInscripciones
- *   GET    /api/inscripciones/{cedula}   200 | 404
- *   POST   /api/inscripciones            201 + Location | 400 | 404 (curso) | 409 (cédula duplicada / sin cupos)
- *   PUT    /api/inscripciones/{cedula}   200 | 400 (intenta cambiar PK/FK) | 404
- *   DELETE /api/inscripciones/{cedula}   204 (desinscribirse) | 404 | 409 (tiene rutinas o historial)
+ *   GET    /api/inscripciones            200 lista (sin contraseñas)                       — ADMINISTRADOR
+ *   GET    /api/inscripciones/mia        200 la del cliente en sesión                      — CLIENTE
+ *   GET    /api/inscripciones/estadisticas  200 conteo que lleva el Observer             — ADMINISTRADOR
+ *   GET    /api/inscripciones/{cedula}   200 | 404                                         — ADMINISTRADOR o el propio cliente
+ *   POST   /api/inscripciones            201 + Location | 400 | 404 (curso) | 409          — público (registro)
+ *   PUT    /api/inscripciones/{cedula}   200 | 400 (intenta cambiar PK/FK) | 404           — ADMINISTRADOR o el propio cliente
+ *   DELETE /api/inscripciones/{cedula}   204 (desinscribirse) | 404 | 409                  — ADMINISTRADOR o el propio cliente
+ *
+ * "El propio cliente": la cédula de la URL debe ser la de la sesión (authentication.name);
+ * con cualquier otra cédula la respuesta es 403.
  */
 @RestController
 @RequestMapping("/api/inscripciones")
@@ -52,12 +56,14 @@ public class InscripcionController {
         this.estadisticasInscripciones = estadisticasInscripciones;
     }
 
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     @GetMapping
     public List<InscripcionRespuestaDTO> listar() {
         return inscripcionService.listar();
     }
 
     /** Ejemplo de uso de la HttpSession: el cliente solo ve su propia inscripción. */
+    @PreAuthorize("hasRole('CLIENTE')")
     @GetMapping("/mia")
     public InscripcionRespuestaDTO mia(HttpSession sesion) {
         String cedula = autenticacionService.usuarioActual(sesion).cedula();
@@ -65,11 +71,13 @@ public class InscripcionController {
     }
 
     /** Patrón Observer: datos que lleva el observador EstadisticasInscripciones. */
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     @GetMapping("/estadisticas")
     public Map<String, Object> estadisticas() {
         return estadisticasInscripciones.resumen();
     }
 
+    @PreAuthorize("hasRole('ADMINISTRADOR') or (hasRole('CLIENTE') and #cedula == authentication.name)")
     @GetMapping("/{cedula}")
     public InscripcionRespuestaDTO obtener(@PathVariable String cedula) {
         return inscripcionService.obtener(cedula);
@@ -86,6 +94,7 @@ public class InscripcionController {
         return ResponseEntity.created(URI.create("/api/inscripciones/" + creada.cedula())).body(cuerpo);
     }
 
+    @PreAuthorize("hasRole('ADMINISTRADOR') or (hasRole('CLIENTE') and #cedula == authentication.name)")
     @PutMapping("/{cedula}")
     public ResultadoOperacionDTO<InscripcionRespuestaDTO> actualizar(@PathVariable String cedula,
                                                                      @Valid @RequestBody InscripcionDTO cambios) {
@@ -93,6 +102,7 @@ public class InscripcionController {
         return new ResultadoOperacionDTO<>("Inscripción actualizada correctamente.", 1, actualizada);
     }
 
+    @PreAuthorize("hasRole('ADMINISTRADOR') or (hasRole('CLIENTE') and #cedula == authentication.name)")
     @DeleteMapping("/{cedula}")
     public ResponseEntity<Void> eliminar(@PathVariable String cedula) {
         inscripcionService.eliminar(cedula);

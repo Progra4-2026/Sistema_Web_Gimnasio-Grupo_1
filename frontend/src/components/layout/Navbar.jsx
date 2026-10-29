@@ -11,6 +11,13 @@ const ENLACES = [
   { ruta: '/blog', etiqueta: 'Blog' },
 ];
 
+// Secciones privadas: cada rol ve solo la suya (el backend también lo verifica)
+const ENLACES_POR_ROL = {
+  cliente: { ruta: '/servicios/rutinas', etiqueta: 'Mis rutinas' },
+  instructor: { ruta: '/instructor', etiqueta: 'Panel instructor' },
+  administrador: { ruta: '/mantenimiento', etiqueta: 'Mantenimiento' },
+};
+
 export default function Navbar() {
   const [menuAbierto, setMenuAbierto] = useState(false);
   const { usuario, cerrarSesion } = useAuth();
@@ -21,9 +28,14 @@ export default function Navbar() {
   }
 
   async function manejarCerrarSesion() {
-    await cerrarSesion();
-    notificar('info', 'Sesión cerrada.');
-    setMenuAbierto(false);
+    try {
+      await cerrarSesion();
+      notificar('info', 'Sesión cerrada.');
+    } catch (error) {
+      notificar('error', error.message);
+    } finally {
+      setMenuAbierto(false);
+    }
   }
 
   return (
@@ -44,7 +56,7 @@ export default function Navbar() {
 
         <nav aria-label="Menú principal" className={menuAbierto ? 'menu-abierto' : ''}>
           <ul className="menu-principal">
-            {ENLACES.map((enlace) => (
+            {[...ENLACES, ...(usuario && ENLACES_POR_ROL[usuario.rol] ? [ENLACES_POR_ROL[usuario.rol]] : [])].map((enlace) => (
               <li key={enlace.ruta}>
                 <NavLink to={enlace.ruta} onClick={manejarClicEnlace}>
                   {enlace.etiqueta}
@@ -59,9 +71,15 @@ export default function Navbar() {
             </NavLink>
           )}
 
+          {!usuario && (
+            <NavLink to="/login" className="boton boton-ingresar" onClick={manejarClicEnlace}>
+              Ingresar
+            </NavLink>
+          )}
+
           {usuario && (
             <div className="sesion-navbar">
-              <span>Hola, {usuario.nombre}</span>
+              <span>Hola, {usuario.nombre} <small>({usuario.rolLegible})</small></span>
               <button type="button" className="boton boton-secundario" onClick={manejarCerrarSesion}>
                 Cerrar sesión
               </button>

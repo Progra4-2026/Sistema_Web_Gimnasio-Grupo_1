@@ -3,13 +3,13 @@ import { useNotificacion } from '../../context/NotificationContext';
 import './Toast.css';
 
 export default function Toast() {
-  const { visible, tipo, texto, ocultar } = useNotificacion();
+  const { visible, tipo, texto, id, ocultar } = useNotificacion();
 
   useEffect(() => {
     if (!visible) return;
     const temporizador = setTimeout(ocultar, 4000);
     return () => clearTimeout(temporizador);
-  }, [visible, texto, ocultar]);
+  }, [visible, id, ocultar]);
 
   if (!visible) return null;
 

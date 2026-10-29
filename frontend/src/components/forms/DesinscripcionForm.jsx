@@ -4,20 +4,17 @@ import { useNotificacion } from '../../context/NotificationContext';
 import Modal from '../common/Modal';
 import './Forms.css';
 
-export default function DesinscripcionForm() {
-  const [cedula, setCedula] = useState('');
-  const [error, setError] = useState('');
+/**
+ * Baja de la inscripción del cliente con sesión iniciada. La cédula viene de la sesión y no se
+ * puede cambiar: el backend solo permite que un cliente elimine su propia inscripción.
+ */
+export default function DesinscripcionForm({ cedula, onDesinscripcionExitosa }) {
   const [confirmacionAbierta, setConfirmacionAbierta] = useState(false);
   const [enviando, setEnviando] = useState(false);
   const { notificar } = useNotificacion();
 
   function manejarEnvio(evento) {
     evento.preventDefault();
-    if (!/^[0-9]{9,12}$/.test(cedula)) {
-      setError('Ingresá una cédula válida (9 a 12 dígitos).');
-      return;
-    }
-    setError('');
     setConfirmacionAbierta(true);
   }
 
@@ -26,7 +23,7 @@ export default function DesinscripcionForm() {
     try {
       await eliminarInscripcion(cedula);
       notificar('exito', 'Tu inscripción fue eliminada correctamente.');
-      setCedula('');
+      onDesinscripcionExitosa?.(); // avisa al componente padre (DesinscripcionPage) para recargar los cupos
     } catch (err) {
       notificar('error', err.message);
     } finally {
@@ -40,8 +37,7 @@ export default function DesinscripcionForm() {
       <form className="formulario" onSubmit={manejarEnvio}>
         <div className="campo-formulario">
           <label htmlFor="desin-cedula">Cédula / Identificación <span className="obligatorio">*</span></label>
-          <input id="desin-cedula" value={cedula} onChange={(evento) => setCedula(evento.target.value)} placeholder="Ej: 304560789" />
-          {error && <p className="texto-error">{error}</p>}
+          <input id="desin-cedula" value={cedula} readOnly disabled />
         </div>
         <p className="texto-ayuda">Nota: la solicitud solo se procesará si no existen pagos pendientes asociados a tu cuenta.</p>
         <button type="submit" className="boton boton-peligro">Confirmar desinscripción</button>

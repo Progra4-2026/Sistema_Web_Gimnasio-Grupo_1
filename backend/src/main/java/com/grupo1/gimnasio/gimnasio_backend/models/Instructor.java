@@ -39,6 +39,10 @@ public class Instructor {
     @Column(name = "fecha_contratacion", nullable = false)
     private LocalDate fechaContratacion;
 
+    /** Contraseña cifrada con BCrypt (hash + salt). Nunca en texto plano. */
+    @Column(name = "password_hash", length = 100)
+    private String passwordHash;
+
     @OneToMany(mappedBy = "instructor")
     private List<Rutina> rutinas = new ArrayList<>();
 
@@ -118,6 +122,19 @@ public class Instructor {
 
     public void setFechaContratacion(LocalDate fechaContratacion) {
         this.fechaContratacion = fechaContratacion;
+    }
+
+    public String getPasswordHash() {
+        return passwordHash;
+    }
+
+    public void setPasswordHash(String passwordHash) {
+        this.passwordHash = passwordHash;
+    }
+
+    /** Nombre y apellidos en una sola cadena, para mostrar. */
+    public String nombreCompleto() {
+        return String.join(" ", nombre, apellido1, apellido2).trim().replaceAll("\\s+", " ");
     }
 
     public List<Rutina> getRutinas() {
