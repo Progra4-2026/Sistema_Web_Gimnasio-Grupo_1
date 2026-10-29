@@ -26,7 +26,9 @@ export default function LoginPage() {
           Clientes: ingresá con tu cédula. Instructores y administradores: con su código.
         </p>
       </div>
-      <LoginForm onExito={(u) => navigate(u.destinoTrasLogin(desde), { replace: true })} />
+      <div className="tarjeta tarjeta-login">
+        <LoginForm apilado onExito={(u) => navigate(u.destinoTrasLogin(desde), { replace: true })} />
+      </div>
     </section>
   );
 }

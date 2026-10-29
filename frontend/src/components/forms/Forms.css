@@ -5,6 +5,15 @@
   max-width: 480px;
 }
 
+/* Formulario de inicio de sesión apilado (LoginPage) */
+.formulario-login {
+  max-width: none;
+}
+
+.formulario-login .boton {
+  width: 100%;
+}
+
 .formulario-inline {
   flex-direction: row;
   flex-wrap: wrap;
