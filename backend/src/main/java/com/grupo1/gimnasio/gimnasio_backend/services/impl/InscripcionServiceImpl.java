@@ -2,10 +2,8 @@ package com.grupo1.gimnasio.gimnasio_backend.services.impl;
 
 import com.grupo1.gimnasio.gimnasio_backend.dto.InscripcionDTO;
 import com.grupo1.gimnasio.gimnasio_backend.dto.InscripcionRespuestaDTO;
-import com.grupo1.gimnasio.gimnasio_backend.dto.UsuarioSesionDTO;
 import com.grupo1.gimnasio.gimnasio_backend.exceptions.ConflictoException;
 import com.grupo1.gimnasio.gimnasio_backend.exceptions.DatosInvalidosException;
-import com.grupo1.gimnasio.gimnasio_backend.exceptions.NoAutenticadoException;
 import com.grupo1.gimnasio.gimnasio_backend.exceptions.RecursoNoEncontradoException;
 import com.grupo1.gimnasio.gimnasio_backend.models.Cliente;
 import com.grupo1.gimnasio.gimnasio_backend.models.Credencial;
@@ -21,6 +19,7 @@ import com.grupo1.gimnasio.gimnasio_backend.services.InscripcionService;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,7 +47,8 @@ import static com.grupo1.gimnasio.gimnasio_backend.services.impl.ReglasValidacio
  *  - curso: debe existir y tener cupos (se reserva uno); rutina: objetivo válido;
  *  - al actualizar no se cambia la cédula (PK) ni el curso (FK);
  *  - al desinscribir se libera el cupo del curso; no se puede si el cliente tiene rutinas o historial;
- *  - la contraseña se guarda cifrada con hash + salt, nunca en texto plano.
+ *  - la contraseña se guarda cifrada con BCrypt (hash + salt), nunca en texto plano;
+ *  - el inicio de sesión de los tres roles está en AutenticacionServiceImpl.
  *
  * Patrón Singleton: bean de alcance singleton.
  * Patrón Observer: avisa a PublicadorInscripciones (Subject) en cada inscripción y desinscripción.
@@ -70,12 +70,13 @@ public class InscripcionServiceImpl implements InscripcionService {
     private final HistorialCursoRepository historialCursoRepository;
     private final CursoService cursoService;
     private final PublicadorInscripciones publicador;
+    private final PasswordEncoder passwordEncoder;
 
     /** Inyección por constructor: Spring entrega el único bean de cada dependencia. */
     public InscripcionServiceImpl(ClienteRepository clienteRepository, CredencialRepository credencialRepository,
                                   CursoRepository cursoRepository, RutinaRepository rutinaRepository,
                                   HistorialCursoRepository historialCursoRepository, CursoService cursoService,
-                                  PublicadorInscripciones publicador) {
+                                  PublicadorInscripciones publicador, PasswordEncoder passwordEncoder) {
         this.clienteRepository = clienteRepository;
         this.credencialRepository = credencialRepository;
         this.cursoRepository = cursoRepository;
@@ -83,6 +84,7 @@ public class InscripcionServiceImpl implements InscripcionService {
         this.historialCursoRepository = historialCursoRepository;
         this.cursoService = cursoService;
         this.publicador = publicador;
+        this.passwordEncoder = passwordEncoder;
     }
 
     /** PATRÓN ITERATOR: recorre la colección de entidades Cliente con java.util.Iterator. */
@@ -134,7 +136,7 @@ public class InscripcionServiceImpl implements InscripcionService {
 
         Credencial credencial = new Credencial();
         credencial.setCliente(cliente);
-        credencial.setPasswordHash(HashContrasenas.cifrar(datos.password()));
+        credencial.setPasswordHash(passwordEncoder.encode(datos.password())); // BCrypt: hash + salt
         cliente.setCredencial(credencial);
 
         Cliente guardado = clienteRepository.save(cliente); // cascade: guarda también la credencial
@@ -188,18 +190,6 @@ public class InscripcionServiceImpl implements InscripcionService {
         clienteRepository.delete(cliente); // orphanRemoval: borra también la credencial
         if (idCurso != null) cursoService.liberarCupo(idCurso);
         publicador.notificar(aviso);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public UsuarioSesionDTO autenticar(String cedula, String password) {
-        Long numero = vacio(cedula) || !CEDULA.matcher(cedula.trim()).matches() ? null : Long.valueOf(cedula.trim());
-        Credencial credencial = numero == null ? null : credencialRepository.findById(numero).orElse(null);
-        // Mismo mensaje si la cédula no existe o la contraseña es incorrecta: no revela cuál falló
-        if (credencial == null || vacio(password) || !HashContrasenas.coincide(password, credencial.getPasswordHash())) {
-            throw new NoAutenticadoException("Cédula o contraseña incorrectas.");
-        }
-        return new UsuarioSesionDTO(String.valueOf(numero), nombreCompleto(credencial.getCliente()), "cliente");
     }
 
     /* ---------- auxiliares ---------- */

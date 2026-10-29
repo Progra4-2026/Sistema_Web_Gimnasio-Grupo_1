@@ -2,6 +2,7 @@ const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
 function mensajePorEstado(estado) {
   if (estado === 401) return 'Iniciá sesión para continuar.';
+  if (estado === 403) return 'No tenés permiso para realizar esta acción.';
   if (estado === 404) return 'El recurso solicitado no existe.';
   if (estado >= 500) return 'Ocurrió un error en el servidor. Intentá de nuevo más tarde.';
   return 'No se pudo completar la solicitud.';

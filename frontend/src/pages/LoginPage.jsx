@@ -4,26 +4,29 @@ import LoginForm from '../components/forms/LoginForm';
 import './Pages.css';
 
 /**
- * Página de inicio de sesión. Si RutaPrivada mandó al usuario aquí,
- * al iniciar sesión vuelve a la página que quería abrir.
+ * Página de inicio de sesión (cliente, instructor o administrador).
+ * Si RutaPrivada mandó al usuario aquí, vuelve a esa página (si su rol puede verla); si no, va a la sección de su rol:
+ * cliente → Mis rutinas, instructor → Panel del instructor, administrador → Mantenimiento.
  */
 export default function LoginPage() {
   const { usuario, cargando } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const destino = location.state?.desde || '/mantenimiento';
+  const desde = location.state?.desde;
 
   if (!cargando && usuario) {
-    return <Navigate to={destino} replace />;
+    return <Navigate to={usuario.destinoTrasLogin(desde)} replace />;
   }
 
   return (
     <section className="seccion contenedor">
       <div className="titulo-seccion">
         <h1>Iniciar sesión</h1>
-        <p>Ingresá con tu cédula y la contraseña de tu inscripción.</p>
+        <p>
+          Clientes: ingresá con tu cédula. Instructores y administradores: con su código.
+        </p>
       </div>
-      <LoginForm onExito={() => navigate(destino, { replace: true })} />
+      <LoginForm onExito={(u) => navigate(u.destinoTrasLogin(desde), { replace: true })} />
     </section>
   );
 }

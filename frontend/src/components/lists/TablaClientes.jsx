@@ -1,5 +1,15 @@
 import Coleccion from '../../models/Coleccion';
 
+/**
+ * Los clientes de los datos de prueba (GIMNASIO.sql) no se inscribieron por la web:
+ * no tienen tipo de inscripción ni fecha de nacimiento.
+ */
+function describirInscripcion(cliente) {
+  if (cliente.esACurso()) return `Curso #${cliente.idCurso}`;
+  if (cliente.tipoInscripcion === 'rutina') return `Rutina (${cliente.objetivo})`;
+  return 'Registrado en el gimnasio';
+}
+
 /** Tabla de clientes inscritos para Mantenimiento. Los botones avisan al padre con onEditar / onEliminar. */
 export default function TablaClientes({ clientes, onEditar, onEliminar }) {
   const coleccion = new Coleccion(clientes);
@@ -26,8 +36,8 @@ export default function TablaClientes({ clientes, onEditar, onEliminar }) {
               <td>{cliente.nombre}</td>
               <td>{cliente.email}</td>
               <td>{cliente.telefono}</td>
-              <td>{cliente.edad}</td>
-              <td>{cliente.esACurso() ? `Curso #${cliente.idCurso}` : `Rutina (${cliente.objetivo})`}</td>
+              <td>{cliente.edad ?? '—'}</td>
+              <td>{describirInscripcion(cliente)}</td>
               <td>
                 <div className="tabla-acciones">
                   <button type="button" className="boton boton-pequeno boton-secundario" onClick={() => onEditar(cliente)}>Editar</button>

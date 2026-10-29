@@ -12,6 +12,8 @@ CREATE DATABASE gimnasio_db CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
 USE gimnasio_db;
 
 -- Limpieza previa (orden inverso a las dependencias, por las FK)
+DROP TABLE IF EXISTS parametros_sistema;
+DROP TABLE IF EXISTS administradores;
 DROP TABLE IF EXISTS consultas;
 DROP TABLE IF EXISTS credenciales;
 DROP TABLE IF EXISTS historial_curso;
@@ -256,6 +258,49 @@ CREATE TABLE consultas (
     CONSTRAINT pkconsultas PRIMARY KEY (id_consulta)
 );
 
+
+-- ============================================================
+-- i. Entregable 6: seguridad y roles (cliente, instructor, administrador)
+-- ============================================================
+-- Las contraseñas se guardan cifradas con BCrypt (hash + salt), nunca en texto plano.
+-- Los hashes de demostración NO se escriben aquí: al arrancar el backend,
+-- CargaInicialDatosRunner completa los que falten:
+--   cliente     -> usuario = cédula,  contraseña = su cédula
+--   instructor  -> usuario = código,  contraseña = su código
+--   admin       -> usuario = 1,       contraseña = admin123
+
+-- Contraseña del instructor (se asigna al crearlo desde el panel de administración)
+ALTER TABLE instructores ADD COLUMN password_hash VARCHAR(100);
+
+-- Administradores del sistema
+CREATE TABLE administradores (
+    cod_administrador BIGINT NOT NULL AUTO_INCREMENT,
+    nombre VARCHAR(60) NOT NULL,
+    e_mail VARCHAR(100),
+    password_hash VARCHAR(100) NOT NULL,
+    CONSTRAINT pkadministradores PRIMARY KEY (cod_administrador)
+);
+
+-- Parámetros del sistema (los edita el administrador)
+CREATE TABLE parametros_sistema (
+    clave VARCHAR(50) NOT NULL,
+    valor VARCHAR(255) NOT NULL,
+    descripcion VARCHAR(255),
+    CONSTRAINT pkparametros_sistema PRIMARY KEY (clave)
+);
+
+INSERT INTO parametros_sistema (clave, valor, descripcion) VALUES ('nombre_gimnasio', 'Gimnasio PowerFit', 'Nombre comercial que se muestra en el sitio');
+INSERT INTO parametros_sistema (clave, valor, descripcion) VALUES ('horario_atencion', 'Lunes a viernes 5:00-22:00, sábados 7:00-14:00', 'Horario de atención al público');
+INSERT INTO parametros_sistema (clave, valor, descripcion) VALUES ('telefono_contacto', '2222-3333', 'Teléfono de contacto del gimnasio');
+INSERT INTO parametros_sistema (clave, valor, descripcion) VALUES ('correo_contacto', 'info@powerfit.cr', 'Correo de contacto del gimnasio');
+INSERT INTO parametros_sistema (clave, valor, descripcion) VALUES ('capacidad_maxima', '100', 'Cantidad máxima de personas dentro del gimnasio');
+INSERT INTO parametros_sistema (clave, valor, descripcion) VALUES ('horas_maximas_rutina', '4', 'Horas máximas recomendadas por rutina diaria');
+
+-- Administrador de demostración (usuario 1 / contraseña admin123).
+-- La contraseña se guarda cifrada con BCrypt; nunca en texto plano.
+-- Las contraseñas de clientes e instructores de prueba las completa el backend
+-- al arrancar (config/CargaInicialDatosRunner): cada uno usa su cédula o código.
+INSERT INTO administradores (cod_administrador, nombre, e_mail, password_hash) VALUES (1, 'Administrador', 'admin@powerfit.cr', '$2a$10$PpBlBEb1dKA1c.Tb/pXLuutzKfWTtJ/Gw7fk398nbwyyy2kHtRmOy');
 
 -- ============================================================
 -- Consultas de análisis (convertidas de Oracle a MySQL)

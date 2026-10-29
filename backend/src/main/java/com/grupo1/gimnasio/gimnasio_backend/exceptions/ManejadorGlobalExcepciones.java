@@ -4,6 +4,10 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.FieldError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -21,7 +25,8 @@ import java.util.logging.Logger;
  * Manejo central de excepciones para todos los controladores (@RestControllerAdvice).
  * Convierte cada excepción en una respuesta JSON con el código HTTP correcto:
  *   400 Bad Request   → DatosInvalidosException, validación de @Valid, JSON mal formado, parámetro inválido
- *   401 Unauthorized  → NoAutenticadoException
+ *   401 Unauthorized  → NoAutenticadoException, acceso a un servicio protegido sin sesión
+ *   403 Forbidden     → @PreAuthorize rechazó el rol del usuario (por ejemplo, un cliente en /api/admin)
  *   404 Not Found     → RecursoNoEncontradoException, ruta inexistente
  *   405 Method Not Allowed → verbo HTTP no soportado en la ruta
  *   409 Conflict      → ConflictoException, violación de llave foránea o duplicado en la base de datos
@@ -86,6 +91,22 @@ public class ManejadorGlobalExcepciones {
         LOG.log(Level.WARNING, "Violación de integridad en la base de datos", ex);
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(Map.of("mensaje", "La operación no se puede completar porque afecta datos relacionados."));
+    }
+
+    /**
+     * @PreAuthorize rechazó el acceso dentro de un controlador. Va antes que el manejador genérico
+     * de Exception: sin este método, un rol incorrecto terminaría como 500 en vez de 403.
+     */
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<Map<String, Object>> manejarAccesoDenegado(AccessDeniedException ex) {
+        Authentication actual = SecurityContextHolder.getContext().getAuthentication();
+        boolean sinSesion = actual == null || actual instanceof AnonymousAuthenticationToken;
+        if (sinSesion) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("mensaje", "Iniciá sesión para continuar."));
+        }
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(Map.of("mensaje", "No tenés permiso para realizar esta acción."));
     }
 
     @ExceptionHandler(Exception.class)

@@ -27,7 +27,7 @@
 		<url/>
 	</scm>
 	<properties>
-		<java.version>16</java.version>
+		<java.version>26</java.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -41,6 +41,11 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-validation</artifactId>
+		</dependency>
+		<!-- Seguridad: sesión, BCrypt, autorización por roles (@PreAuthorize), CORS y cabeceras -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
 		<!-- Servicio SOAP de ejemplo (/ws): Spring Web Services + JAXB + WSDL -->
 		<dependency>

@@ -25,6 +25,20 @@ Avance por entregable:
 - **Entregable 1:** acta de constitución, ambiente de desarrollo y modelo de datos (`docs/`, `database/GIMNASIO.sql`).
 - **Entregable 2:** páginas HTML5/CSS3 responsive: Inicio, Contactos, Servicios y Blog.
 - **Entregable 3:** JavaScript del lado del cliente: validación de formularios, eventos y manipulación del DOM, `fetch` con `async/await` contra el backend, `localStorage` / `sessionStorage` y mensajes de éxito/error sin recargar la página.
+- **Entregable 4:** backend con Spring Boot + JPA/Hibernate: entidades, repositorios, servicios, sesiones HTTP, servicios REST y SOAP, patrones Singleton, Observer e Iterator, validación y manejo central de errores.
+- **Entregable 5:** SPA en React con React Router, componentes reutilizables, Context, capas `components/`, `services/` y `models/`, y guard de rutas.
+- **Entregable 6 (entrega final):** login para los tres roles, contraseñas con BCrypt, autorización por roles, CORS, cabeceras de seguridad, documentación técnica y manual de usuario.
+
+## Documentación
+
+| Documento | Ubicación |
+|---|---|
+| Documentación técnica (arquitectura, componentes, despliegue, casos de uso, instalación) | [`docs/Documentacion_Tecnica.pdf`](docs/Documentacion_Tecnica.pdf) |
+| Manual de usuario (capturas de cada vista y pasos de las operaciones principales) | [`docs/Manual_Usuario.pdf`](docs/Manual_Usuario.pdf) |
+| Servicio SOAP (WSDL, XSD y ejemplos) | [`docs/soap/`](docs/soap/README.md) |
+| Script de la base de datos (tablas y datos de prueba) | [`database/GIMNASIO.sql`](database/GIMNASIO.sql) |
+
+Las fuentes HTML de los PDF están en `docs/documentacion/`.
 
 ## Requisitos previos
 
@@ -35,6 +49,16 @@ Antes de clonar, asegurate de tener instalado:
 - **Node.js** v20 o superior (incluye npm) — [nodejs.org](https://nodejs.org)
 - **MySQL** 8 o superior, corriendo localmente
 - **Git**
+
+## Despliegue paso a paso
+
+El sistema tiene tres partes que se levantan **en este orden**: base de datos → backend → frontend. Cada una corre en su propio puerto:
+
+| Parte | Puerto | Se levanta con |
+|---|---|---|
+| MySQL | 3306 | el servicio de MySQL instalado |
+| Backend (Spring Boot) | 8080 | IntelliJ o `./mvnw spring-boot:run` |
+| Frontend (Vite / Node.js) | 5173 | `npm run dev` |
 
 ## 1. Clonar el repositorio
 
@@ -57,7 +81,9 @@ Verificá que las tablas se crearon correctamente:
 mysql -u root -p gimnasio_db -e "SHOW TABLES;"
 ```
 
-Deberías ver: `cliente`, `cursos`, `Curso_cliente`, `historial_curso`, `instructores`, `maquinas`, `rutinas`, `Rutina_cliente`.
+Deberías ver: `administradores`, `cliente`, `consultas`, `credenciales`, `cursos`, `historial_curso`, `instructores`, `maquinas`, `parametros_sistema`, `rutinas`.
+
+> **Si ya tenías la base creada de un entregable anterior**, volvé a ejecutar el script: el Entregable 6 agrega `administradores`, `parametros_sistema` y la columna `password_hash` de `instructores`.
 
 ## 3. Levantar el backend (Spring Boot)
 
@@ -82,7 +108,8 @@ DB_PASSWORD=tu_contraseña_de_mysql
 
 3. Dejá que IntelliJ descargue las dependencias de Maven (barra de progreso inferior).
 4. Ejecutá la clase principal `GimnasioBackendApplication.java` (botón ▶️ o `Run`).
-5. El servidor queda escuchando en `http://localhost:8080`.
+   - Sin IntelliJ, desde una terminal en `backend/`: `./mvnw spring-boot:run` (en Windows: `mvnw.cmd spring-boot:run`).
+5. El servidor queda escuchando en `http://localhost:8080`. Al arrancar, completa las contraseñas de los usuarios de prueba (ver [Login y roles](#login-y-roles-entregable-6)).
 
 **Verificación:** abrí `http://localhost:8080/api/health` en el navegador. Debe responder:
 
@@ -104,11 +131,44 @@ npm run dev
 
 Abrí en el navegador la URL que indique la terminal (por defecto `http://localhost:5173`).
 
-Deberías ver el componente principal mostrando **"Sistema Web Gimnasio - Grupo 1"**.
+Deberías ver la página de **Inicio** de Gimnasio PowerFit. Toda la aplicación es una SPA de React: las secciones (Servicios, Contactos, Blog, Mantenimiento…) cambian sin recargar la página.
 
-## 5. Ver las páginas del sitio (Entregables 2 y 3)
+## 5. Verificar que todo funciona
 
-Con el mismo servidor de Vite corriendo (`npm run dev`), las páginas se sirven directamente desde `frontend/public/`, sin pasar por React:
+1. En `http://localhost:5173`, entrá a **Servicios → Cursos**: tiene que aparecer la lista de cursos (viene del backend y de MySQL).
+2. Presioná **Ingresar** e iniciá sesión como administrador: usuario `1`, contraseña `admin123`. Tenés que llegar a **Mantenimiento**.
+3. Cerrá sesión e ingresá como instructor (`100` / `100`) → **Panel instructor**, y como cliente (`201` / `201`) → **Mis rutinas**.
+
+El paso a paso de cada operación, con capturas, está en el [manual de usuario](docs/Manual_Usuario.pdf).
+
+### Problemas frecuentes
+
+| Problema | Solución |
+|---|---|
+| El backend no arranca: `Access denied for user 'root'` | La contraseña de MySQL no es `root`: creá `backend/.env` (paso 3.2). |
+| El backend no arranca: `Unknown database 'gimnasio_db'` o falta una tabla | Ejecutá `database/GIMNASIO.sql` (paso 2). Si venías de un entregable anterior, ejecutalo de nuevo. |
+| `Port 8080 was already in use` o `Port 5173 is in use` | Ya hay otra instancia corriendo: cerrala o detené el proceso que usa ese puerto. |
+| La página muestra "No se pudo conectar con el servidor" | El backend no está corriendo o no terminó de arrancar (revisá `http://localhost:8080/api/health`). |
+| El login falla con un usuario de prueba | Reiniciá el backend: al arrancar completa las contraseñas de prueba que falten. |
+| `npm run dev` falla con módulos faltantes | Ejecutá `npm install` dentro de `frontend/`. |
+
+## 6. Despliegue para producción (opcional)
+
+En lugar de los servidores de desarrollo, se pueden generar los artefactos finales:
+
+```bash
+cd backend && ./mvnw clean package && java -jar target/*.jar
+```
+
+```bash
+cd frontend && npm run build
+```
+
+`npm run build` deja el frontend compilado en `frontend/dist/`, que puede servir cualquier servidor web (por ejemplo Apache de XAMPP o `npm run preview`). El servidor debe redirigir las rutas de la SPA a `index.html`, y la URL del frontend tiene que estar en `app.cors.origenes-permitidos` (`backend/src/main/resources/application.properties`). En producción el sitio debe publicarse con HTTPS: así Spring Security envía también la cabecera `Strict-Transport-Security`.
+
+## Anexo: páginas HTML de los Entregables 2 y 3
+
+Las páginas estáticas de los primeros entregables se conservan como referencia. No forman parte de la SPA. Con el servidor de Vite corriendo (`npm run dev`), se sirven directamente desde `frontend/public/`:
 - http://localhost:5173/html/inicio.html
 - http://localhost:5173/html/blog.html
 - http://localhost:5173/html/contacto.html
@@ -140,32 +200,65 @@ Módulos JavaScript (`frontend/public/js/`):
 
 Estas páginas son independientes del SPA de React — conviven en el mismo repositorio pero no comparten código ni build.
 
+## Login y roles (Entregable 6)
+
+El sistema tiene 3 roles. Todos inician sesión en `/login` con el mismo formulario; la contraseña se guarda cifrada con **BCrypt** (hash + salt, nunca texto plano):
+
+| Rol | Usuario | Dónde está su contraseña | Qué puede hacer |
+|---|---|---|---|
+| Cliente | su cédula | `credenciales.password_hash` | Ver **solo sus propias rutinas** (Servicios → Rutinas), ver/editar/eliminar solo su inscripción |
+| Instructor | su código | `instructores.password_hash` | Gestionar **máquinas y rutinas** (Panel instructor, `/instructor`) |
+| Administrador | su código | `administradores.password_hash` | Gestionar **usuarios** (clientes, instructores, administradores), cursos y **parámetros del sistema** (Mantenimiento, `/mantenimiento`) |
+
+Datos de prueba: al arrancar, `config/CargaInicialDatosRunner` completa las contraseñas que falten (nunca reemplaza una existente) y crea un administrador si no hay ninguno:
+
+| Rol | Usuario | Contraseña |
+|---|---|---|
+| Cliente | `200` (o cualquier cédula de `GIMNASIO.sql`) | `200` (su propia cédula) |
+| Instructor | `100` (o cualquier código de `GIMNASIO.sql`) | `100` (su propio código) |
+| Administrador | `1` | `admin123` |
+
+La autorización se verifica en el **backend** (Spring Security: reglas por URL en `SecurityConfig` + `@PreAuthorize` por rol en cada controlador) y el frontend solo oculta lo que el rol no puede usar (`RutaPrivada` con `roles`). Sin sesión la API responde `401`; con sesión pero sin el rol, `403`.
+
+## Seguridad (Entregable 6)
+
+- **Autenticación:** sesión HTTP (`HttpSession` + cookie `JSESSIONID` HttpOnly, 30 min de inactividad). Al iniciar sesión se renueva el id de sesión (evita fijación de sesión) y se guarda el `SecurityContext` con el rol.
+- **Contraseñas:** `BCryptPasswordEncoder`. El mismo mensaje "Usuario o contraseña incorrectos." para usuario inexistente o contraseña errónea.
+- **Inyección SQL:** todo el acceso a datos pasa por el ORM (repositorios `JpaRepository`). No hay SQL armado concatenando texto: Hibernate usa sentencias preparadas con parámetros `?`, visibles en la consola gracias a `spring.jpa.show-sql=true` (para ver también los valores: `logging.level.org.hibernate.orm.jdbc.bind=TRACE`).
+- **CORS:** una sola configuración en `config/CorsConfig.java`, aplicada por Spring Security. Los orígenes permitidos están en `app.cors.origenes-permitidos` (`application.properties`); con cookies de sesión nunca se usa `*`.
+- **Cabeceras HTTP de seguridad:** `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Content-Security-Policy`, `Referrer-Policy` y `Strict-Transport-Security` (esta última solo sobre HTTPS). En la API se configuran en `config/SecurityConfig.java`; en el frontend, en `frontend/vite.config.js`. Para verlas: `curl -I http://localhost:8080/api/health` y `curl -I http://localhost:5173/`.
+- **Documentación técnica:** `docs/Documentacion_Tecnica.pdf` (arquitectura, diagramas de componentes y de despliegue, casos de uso, seguridad e instalación). Fuente editable: `docs/documentacion/Documentacion_Tecnica.html`.
+
 ## Endpoints disponibles
 
-| Método | Ruta | Descripción |
-|---|---|---|
-| GET | `/api/health` | Verifica que el backend esté activo. Responde `{"status":"ok"}` |
-| GET | `/api/cursos` | Lista de cursos |
-| GET | `/api/cursos/{id}` | Un curso. `404` si no existe |
-| POST | `/api/cursos` | Crea un curso. `201`, `400` (datos inválidos) o `409` (nombre repetido) |
-| PUT | `/api/cursos/{id}` | Actualiza un curso. `200`, `400`, `404` o `409` |
-| DELETE | `/api/cursos/{id}` | Elimina un curso. `204`, `404` o `409` (tiene inscritos o historial) |
-| GET | `/api/inscripciones` | Lista de clientes |
-| GET | `/api/inscripciones/{cedula}` | Un cliente. `404` si no existe |
-| GET | `/api/inscripciones/mia` | La inscripción del usuario con sesión iniciada. `401` sin sesión |
-| GET | `/api/inscripciones/estadisticas` | Conteo de inscripciones que lleva el Observer |
-| POST | `/api/inscripciones` | Inscribe un cliente. `201`, `400`, `404` (curso) o `409` (cédula repetida o curso sin cupos) |
-| PUT | `/api/inscripciones/{cedula}` | Actualiza datos de contacto. `200`, `400` o `404` |
-| DELETE | `/api/inscripciones/{cedula}` | Desinscribe. `204`, `404` o `409` (tiene rutinas o historial) |
-| POST | `/api/auth/login` | Inicia sesión (cédula y contraseña). `200` o `401` |
-| GET | `/api/auth/sesion` | Usuario con sesión iniciada. `401` sin sesión |
-| POST | `/api/auth/logout` | Cierra la sesión. `204` |
-| GET | `/api/consultas` | Lista de consultas de Contactos |
-| POST | `/api/consultas` | Recibe el formulario de Contactos. `201` o `400` |
+Acceso: **Público** = sin sesión · **Cliente** / **Instructor** / **Admin** = rol requerido.
+
+| Método | Ruta | Acceso | Descripción |
+|---|---|---|---|
+| GET | `/api/health` | Público | Verifica que el backend esté activo. Responde `{"status":"ok"}` |
+| POST | `/api/auth/login` | Público | Inicia sesión (usuario y contraseña, cualquier rol). `200` o `401` |
+| GET | `/api/auth/sesion` | Público | Usuario con sesión iniciada. `401` sin sesión |
+| POST | `/api/auth/logout` | Público | Cierra la sesión. `204` |
+| GET | `/api/cursos`, `/api/cursos/{id}` | Público | Cursos. `404` si no existe |
+| POST / PUT / DELETE | `/api/cursos[/{id}]` | Admin | Crea `201`, actualiza `200` o elimina `204` un curso (`409` si tiene inscritos o historial) |
+| POST | `/api/inscripciones` | Público | Inscribe un cliente (crea su contraseña BCrypt). `201`, `400`, `404` o `409` |
+| GET | `/api/inscripciones` | Admin | Lista de clientes |
+| GET | `/api/inscripciones/estadisticas` | Admin | Conteo de inscripciones que lleva el Observer |
+| GET | `/api/inscripciones/mia` | Cliente | La inscripción del cliente con sesión iniciada |
+| GET / PUT / DELETE | `/api/inscripciones/{cedula}` | Admin o el propio cliente | Consulta, actualiza datos de contacto o desinscribe (`409` si tiene rutinas o historial) |
+| GET | `/api/maquinas`, `/api/maquinas/{id}` | Público | Máquinas del gimnasio |
+| POST / PUT / DELETE | `/api/maquinas[/{id}]` | Instructor | CRUD de máquinas (`409` al eliminar si está en rutinas) |
+| GET | `/api/rutinas/mias` | Cliente | Solo las rutinas del cliente con sesión iniciada |
+| GET / POST / PUT / DELETE | `/api/rutinas[/{id}]` | Instructor | CRUD de rutinas (al editar solo cambian fecha y horas) |
+| GET / POST / PUT / DELETE | `/api/admin/instructores[/{cod}]` | Admin | CRUD de instructores (`409` al eliminar si tiene rutinas o historial) |
+| GET / POST / DELETE | `/api/admin/administradores[/{cod}]` | Admin | Administradores (no se puede eliminar la propia cuenta ni el último) |
+| GET / PUT | `/api/admin/parametros[/{clave}]` | Admin | Parámetros del sistema (solo cambia el valor) |
+| POST | `/api/consultas` | Público | Recibe el formulario de Contactos. `201` o `400` |
+| GET | `/api/consultas` | Admin | Lista de consultas de Contactos |
 
 **Servicio SOAP** (ejemplo para comparar con REST): `POST /ws`, WSDL en `http://localhost:8080/ws/cursos.wsdl`, operaciones `obtenerCurso` y `listarCursos`. Documentación, WSDL y XSD en [`docs/soap/`](docs/soap/README.md).
 
-Los errores siempre responden JSON con `{"mensaje": "...", "errores": {campo: mensaje}}`, sin trazas ni errores de MySQL.
+Los errores siempre responden JSON con `{"mensaje": "...", "errores": {campo: mensaje}}`, sin trazas ni errores de MySQL (también los `401`/`403` de Spring Security).
 
 ## Backend: estructura y patrones (Entregable 4)
 
@@ -178,6 +271,7 @@ Paquetes en `backend/src/main/java/com/grupo1/gimnasio/gimnasio_backend/`:
 | `repositories/` | Repositorios Spring Data JPA (`JpaRepository`) |
 | `models/` | Entidades JPA mapeadas a las tablas de `GIMNASIO.sql` |
 | `dto/` | Datos que entran y salen de la API, con validación (`@NotBlank`, `@Email`, `@Size`, `@Pattern`...) |
+| `config/` | Spring Security (`SecurityConfig`), CORS (`CorsConfig`), SOAP (`SoapConfig`) y carga de contraseñas de prueba (`CargaInicialDatosRunner`) |
 | `exceptions/` | Excepciones de negocio y el manejador central `@RestControllerAdvice` |
 | `observer/` | Patrón Observer de las inscripciones |
 | `sesion/` | Registro de sesiones HTTP (Singleton) |
@@ -188,7 +282,7 @@ Paquetes en `backend/src/main/java/com/grupo1/gimnasio/gimnasio_backend/`:
 | MVC | `models/` (modelo), `controllers/` (controlador), JSON y páginas HTML (vista) |
 | Singleton | `sesion/GestorSesiones` (instancia única) y los servicios con `@Scope(SINGLETON)` |
 | Observer | `observer/PublicadorInscripciones` (Subject) avisa a `BitacoraInscripciones` y `EstadisticasInscripciones` en cada inscripción o desinscripción |
-| Iterator | `CursoServiceImpl.listar()` e `InscripcionServiceImpl.listar()` recorren las entidades con `java.util.Iterator` |
+| Iterator | Los `listar()` de los servicios (cursos, inscripciones, máquinas, rutinas, instructores, administradores, parámetros) recorren las entidades con `java.util.Iterator`; en el frontend, `models/Coleccion.js` implementa `[Symbol.iterator]` |
 
 > **Si ya tenías la base creada antes del Entregable 4**, volvé a ejecutar `database/GIMNASIO.sql` (paso 2): el script agrega columnas y tablas nuevas (`credenciales`, `consultas`) que el backend necesita.
 
